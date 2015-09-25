@@ -2,7 +2,6 @@ package com.tatteam.popthecamera.actors;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
@@ -13,14 +12,18 @@ public class Lens extends Actor {
 
     private TextureRegion lens;
 
-    public Lens() {
-        lens = new TextureRegion();
-        setBounds(getX(), getY(), getWidth(), getHeight());
+    public Lens(TextureRegion lens) {
+        this.lens = new TextureRegion(lens);
+        setBounds(getX(), getY(), lens.getRegionWidth(), lens.getRegionHeight());
     }
 
     public Lens(TextureRegion lens, float width, float height, float x, float y) {
         this.lens = new TextureRegion(lens);
         setBounds(x, y, width, height);
+    }
+
+    public void setCenterPosition(float parentWidth, float parentHeight) {
+        setPosition(parentWidth / 2 - getWidth() / 2, parentHeight / 2 - getHeight() / 2);
     }
 
     @Override

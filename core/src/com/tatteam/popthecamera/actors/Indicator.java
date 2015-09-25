@@ -14,16 +14,26 @@ public class Indicator extends Actor {
     public boolean isMoving = false;
     public boolean clockwise = true;
     private float angle = 0;
+    private float accelerator;
 
-    public Indicator() {
-        indicator = new TextureRegion();
-        setBounds(getX(), getY(), getWidth(), getHeight());
+    public Indicator(TextureRegion indicator) {
+        this.indicator = new TextureRegion(indicator);
+        setBounds(getX(), getY(), indicator.getRegionWidth(), indicator.getRegionHeight());
+        accelerator = 1;
     }
 
     public Indicator(TextureRegion indicator, float width, float height, float x, float y, float originX, float originY) {
         this.indicator = new TextureRegion(indicator);
         setBounds(x, y, width, height);
         setOrigin(originX, originY);
+    }
+
+    public void setAccelerator(float accelerator) {
+        this.accelerator = accelerator;
+    }
+
+    public void setCenterOrigin(float radius) {
+        setOrigin(getWidth() / 2, -radius);
     }
 
     public void setImage(TextureRegion indicator) {
@@ -40,15 +50,9 @@ public class Indicator extends Actor {
         batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
         if (isMoving) {
             if (clockwise) {
-                angle--;
-                if (angle == -360) {
-                    angle = 0;
-                }
+                angle = (angle - accelerator) % 360;
             } else {
-                angle++;
-                if (angle == 360) {
-                    angle = 0;
-                }
+                angle = (angle + accelerator) % 360;
             }
             setRotation(angle);
         }

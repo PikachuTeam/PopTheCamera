@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.compression.lzma.Base;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.tatteam.popthecamera.actors.Background;
 import com.tatteam.popthecamera.actors.CameraButton;
@@ -88,14 +87,20 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     private void init() {
         // Set up camera group. Camera group includes camera_button, background, lens1, lensGroup.
         cameraGroup = new ActorGroup();
-        cameraGroup.setSize(Constants.BACKGROUND_WIDTH, Constants.BACKGROUND_HEIGHT);
+
+
+        background = new Background(atlas.findRegion("camera"));
+        cameraButton = new CameraButton(atlas.findRegion("camera_button"));
+        lens1 = new Lens(atlas.findRegion("lens1"));
+        initLens();
+
+        cameraGroup.setSize(background.getWidth(), background.getHeight());
         cameraGroup.setPosition(Constants.VIEWPORT_WIDTH / 2 - cameraGroup.getWidth() / 2, Constants.BACKGROUND_HEIGHT / 2 + cameraGroup.getHeight() / 4);
         cameraGroup.setOrigin(cameraGroup.getWidth() / 2, cameraGroup.getHeight() / 2);
 
-        background = new Background(atlas.findRegion("camera"), Constants.BACKGROUND_WIDTH, Constants.BACKGROUND_HEIGHT, 0, 0);
-        cameraButton = new CameraButton(atlas.findRegion("camera_button"), Constants.CAMERA_BUTTON_WIDTH, Constants.CAMERA_BUTTON_HEIGHT, Constants.CAMERA_BUTTON_X, Constants.CAMERA_BUTTON_Y);
-        lens1 = new Lens(atlas.findRegion("lens1"), Constants.LENS1_WIDTH, Constants.LENS1_HEIGHT, Constants.LENS1_X, Constants.LENS1_Y);
-        initLens();
+        lens1.setCenterPosition(cameraGroup.getWidth(), cameraGroup.getHeight());
+        cameraButton.setPosition(cameraButton.getWidth(), cameraGroup.getHeight() - 110f);
+        lensGroup.setPosition(cameraGroup.getWidth() / 2 - lensGroup.getWidth() / 2, cameraGroup.getHeight() / 2 - lensGroup.getHeight() / 2);
 
         cameraGroup.addActor(cameraButton);
         cameraGroup.addActor(background);
@@ -107,9 +112,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         indicatorBeta = Math.toDegrees(Math.acos((2 * radius * radius - Constants.INDICATOR_WIDTH * Constants.INDICATOR_WIDTH) / (2 * radius * radius)));
         dotBeta = Math.toDegrees(Math.acos((2 * radius * radius - Constants.DOT_WIDTH * Constants.DOT_WIDTH) / (2 * radius * radius)));
 
-        BaseLog.checkBeta(indicatorBeta);
-        BaseLog.checkBeta(dotBeta);
-
         cameraGroup.setOnShakeCompleteListener(this);
     }
 
@@ -117,14 +119,24 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     // Lens group includes indicator, dot, lens2, lens 3, lens4.
     private void initLens() {
         lensGroup = new ActorGroup();
-        lensGroup.setSize(Constants.LENS2_WIDTH, Constants.LENS2_HEIGHT);
         lensGroup.setPosition(Constants.GROUP_LENS_X, Constants.GROUP_LENS_Y);
 
-        lens2 = new Lens(atlas.findRegion("lens2"), Constants.LENS2_WIDTH, Constants.LENS2_HEIGHT, Constants.LEN2_X, Constants.LEN2_Y);
-        lens3 = new Lens(atlas.findRegion("lens3"), Constants.LENS3_WIDTH, Constants.LENS3_HEIGHT, Constants.LENS3_X, Constants.LENS3_Y);
-        lens4 = new Lens(atlas.findRegion("lens4"), Constants.LENS4_WIDTH, Constants.LENS4_HEIGHT, Constants.LENS4_X, Constants.LENS4_Y);
-        indicator = new Indicator(atlas.findRegion("indicator"), Constants.INDICATOR_WIDTH, Constants.INDICATOR_HEIGHT, Constants.INDICATOR_X, Constants.INDICATOR_Y, Constants.INDICATOR_ORIGIN_X, Constants.INDICATOR_ORIGIN_Y);
-        dot = new Dot(atlas.findRegion("dot"), Constants.DOT_WIDTH, Constants.DOT_HEIGHT, Constants.DOT_X, Constants.DOT_Y, Constants.DOT_ORIGIN_X, Constants.DOT_ORIGIN_Y);
+        lens2 = new Lens(atlas.findRegion("lens2"));
+        lens3 = new Lens(atlas.findRegion("lens3"));
+        lens4 = new Lens(atlas.findRegion("lens4"));
+
+        lensGroup.setSize(lens2.getWidth(), lens2.getHeight());
+
+        lens2.setCenterPosition(lensGroup.getWidth(), lensGroup.getHeight());
+        lens3.setCenterPosition(lensGroup.getWidth(), lensGroup.getHeight());
+        lens4.setCenterPosition(lensGroup.getWidth(), lensGroup.getHeight());
+
+        indicator = new Indicator(atlas.findRegion("indicator"));
+        indicator.setPosition(lens2.getWidth() / 2 - indicator.getWidth() / 2, lens2.getHeight() - indicator.getHeight());
+        indicator.setCenterOrigin(lens3.getHeight() / 2);
+        dot = new Dot(atlas.findRegion("dot"));
+        dot.setPosition(lens2.getWidth() / 2 - dot.getWidth() / 2, lens2.getHeight() - dot.getHeight() - 10f);
+        dot.setCenterOrigin(lens3.getHeight() / 2);
 
         lensGroup.addActor(lens2);
         lensGroup.addActor(lens3);
@@ -150,17 +162,22 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
-        if (nextLevel) {
+        if (nextLevel || playAgain) {
             indicator.setRotation(0);
             initDotRotation();
             nextLevel = false;
+            playAgain = false;
             indicator.resetAngle();
+            if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
+                indicator.clockwise = false;
+            } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
+                indicator.clockwise = true;
+            }
         } else {
             if (!indicator.isMoving) {
                 indicator.isMoving = true;
             } else {
-                double deltaIndicatorRotation = 0;
+                double deltaIndicatorRotation;
                 double bound1 = dot.getRotation() - dotBeta / 2;
                 double bound2 = dot.getRotation() + dotBeta / 2;
 
@@ -170,15 +187,24 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                     deltaIndicatorRotation = indicator.getRotation();
                 }
 
-                if (indicator.getRotation() > dot.getRotation()) {
-                    deltaIndicatorRotation -= indicatorBeta / 2;
-                } else {
+//                if (indicator.clockwise) {
+//                    if (deltaIndicatorRotation > dot.getRotation()) {
+//                        deltaIndicatorRotation -= indicatorBeta / 2;
+//                    } else {
+//                        deltaIndicatorRotation -= indicatorBeta / 2;
+//                    }
+//                } else {
+                if (deltaIndicatorRotation < dot.getRotation()) {
                     deltaIndicatorRotation += indicatorBeta / 2;
+                } else {
+                    deltaIndicatorRotation -= indicatorBeta / 2;
                 }
 
+                BaseLog.checkRotation("Indicator Rotation", indicator.getRotation());
+                BaseLog.checkRotation("Dot Rotation", dot.getRotation());
                 BaseLog.checkRotation("Delta Indicator Rotation", deltaIndicatorRotation);
-                BaseLog.checkRotation("bound 1", bound1);
-                BaseLog.checkRotation("bound 2", bound2);
+                BaseLog.checkRotation("Bound 1", bound1);
+                BaseLog.checkRotation("Bound 2", bound2);
 
                 if (deltaIndicatorRotation >= bound1 && deltaIndicatorRotation <= bound2) {
                     currentIndex--;
@@ -196,6 +222,9 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                         indicator.isMoving = false;
                     }
                     BaseLog.tingTing();
+                } else {
+                    indicator.isMoving = false;
+                    playAgain = true;
                 }
             }
 //            cameraGroup.shake();

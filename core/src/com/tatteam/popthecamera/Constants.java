@@ -19,11 +19,6 @@ public class Constants {
     public final static float BACKGROUND_WIDTH = 900f;
     public final static float BACKGROUND_HEIGHT = 700f;
 
-    public final static float LENS1_WIDTH = 625f;
-    public final static float LENS1_HEIGHT = 625f;
-    public final static float LENS1_X = BACKGROUND_WIDTH / 2 - LENS1_WIDTH / 2;
-    public final static float LENS1_Y = 10f;
-
     public final static float LENS2_WIDTH = 465f;
     public final static float LENS2_HEIGHT = 465f;
     public final static float LEN2_X = 0f;
@@ -57,10 +52,5 @@ public class Constants {
     public final static float DOT_Y = LENS2_HEIGHT - DOT_HEIGHT - 15f;
     public final static float DOT_ORIGIN_X = DOT_WIDTH / 2;
     public final static float DOT_ORIGIN_Y = -LENS3_HEIGHT / 2 - 10f;
-
-    public final static float CAMERA_BUTTON_WIDTH = 100f;
-    public final static float CAMERA_BUTTON_HEIGHT = 40f;
-    public final static float CAMERA_BUTTON_X = 100f;
-    public final static float CAMERA_BUTTON_Y = BACKGROUND_HEIGHT - 90f;
 
 }

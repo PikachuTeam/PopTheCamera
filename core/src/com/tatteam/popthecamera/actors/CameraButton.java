@@ -14,9 +14,9 @@ public class CameraButton extends Actor {
 
     private TextureRegion cameraButton;
 
-    public CameraButton() {
-        cameraButton = new TextureRegion();
-        setBounds(getX(), getY(), getWidth(), getHeight());
+    public CameraButton(TextureRegion cameraButton) {
+        this.cameraButton = new TextureRegion(cameraButton);
+        setBounds(getX(), getY(), cameraButton.getRegionWidth(), cameraButton.getRegionHeight());
     }
 
     public CameraButton(TextureRegion cameraButton, float width, float height, float x, float y) {
