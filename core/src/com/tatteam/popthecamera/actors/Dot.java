@@ -17,12 +17,6 @@ public class Dot extends Actor {
         setBounds(getX(), getY(), this.dot.getRegionWidth(), this.dot.getRegionHeight());
     }
 
-    public Dot(TextureRegion dot, float width, float height, float x, float y, float originX, float originY) {
-        this.dot = new TextureRegion(dot);
-        setBounds(x, y, width, height);
-        setOrigin(originX, originY);
-    }
-
     public void setCenterOrigin(float radius) {
         setOrigin(getWidth() / 2, -(radius + 10f));
     }

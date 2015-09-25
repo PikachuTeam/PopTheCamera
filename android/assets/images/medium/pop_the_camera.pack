@@ -1,0 +1,94 @@
+
+pop_the_camera.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+camera
+  rotate: false
+  xy: 1, 415
+  size: 674, 603
+  orig: 674, 603
+  offset: 0, 0
+  index: -1
+lens2
+  rotate: false
+  xy: 1, 21
+  size: 392, 392
+  orig: 392, 392
+  offset: 0, 0
+  index: -1
+lens3
+  rotate: false
+  xy: 677, 730
+  size: 288, 288
+  orig: 288, 288
+  offset: 0, 0
+  index: -1
+lens4
+  rotate: false
+  xy: 395, 247
+  size: 166, 166
+  orig: 166, 166
+  offset: 0, 0
+  index: -1
+off_sound
+  rotate: false
+  xy: 677, 650
+  size: 78, 78
+  orig: 78, 78
+  offset: 0, 0
+  index: -1
+off_vibrate
+  rotate: false
+  xy: 395, 167
+  size: 78, 78
+  orig: 78, 78
+  offset: 0, 0
+  index: -1
+on_sound
+  rotate: false
+  xy: 563, 335
+  size: 78, 78
+  orig: 78, 78
+  offset: 0, 0
+  index: -1
+on_vibrate
+  rotate: false
+  xy: 677, 570
+  size: 78, 78
+  orig: 78, 78
+  offset: 0, 0
+  index: -1
+camera_button
+  rotate: false
+  xy: 1, 1
+  size: 83, 18
+  orig: 83, 18
+  offset: 0, 0
+  index: -1
+indicator
+  rotate: false
+  xy: 967, 963
+  size: 18, 55
+  orig: 18, 55
+  offset: 0, 0
+  index: -1
+dot
+  rotate: false
+  xy: 757, 694
+  size: 34, 34
+  orig: 34, 34
+  offset: 0, 0
+  index: -1
+
+pop_the_camera2.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+lens1
+  rotate: false
+  xy: 1, 1
+  size: 518, 516
+  orig: 518, 516
+  offset: 0, 0
+  index: -1
