@@ -22,22 +22,12 @@ public class Indicator extends Actor {
         accelerator = 1;
     }
 
-    public Indicator(TextureRegion indicator, float width, float height, float x, float y, float originX, float originY) {
-        this.indicator = new TextureRegion(indicator);
-        setBounds(x, y, width, height);
-        setOrigin(originX, originY);
-    }
-
     public void setAccelerator(float accelerator) {
         this.accelerator = accelerator;
     }
 
     public void setCenterOrigin(float radius) {
         setOrigin(getWidth() / 2, -radius);
-    }
-
-    public void setImage(TextureRegion indicator) {
-        indicator.setRegion(indicator);
     }
 
     public void resetAngle() {
@@ -59,5 +49,4 @@ public class Indicator extends Actor {
         batch.draw(indicator, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(),
                 getScaleX(), getScaleY(), getRotation());
     }
-
 }

@@ -13,6 +13,7 @@ import com.tatteam.popthecamera.actors.CameraButton;
 import com.tatteam.popthecamera.actors.Dot;
 import com.tatteam.popthecamera.actors.Indicator;
 import com.tatteam.popthecamera.actors.Lens;
+import com.tatteam.popthecamera.actors.TextView;
 
 import java.util.Random;
 
@@ -39,6 +40,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     private Random random;
     private boolean playAgain = false;
     private boolean nextLevel = false;
+    private TextView level;
+    private TextView index;
 
     @Override
     public void create() {
@@ -51,7 +54,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         stage.getViewport().apply();
 //        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
 
-        atlas = new TextureAtlas(Gdx.files.internal("images/pop_the_camera.pack"));
+        atlas = new TextureAtlas(Gdx.files.internal("images/large/pop_the_camera.pack"));
 
         init();
 
@@ -59,6 +62,9 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
         stage.addActor(cameraGroup.getActors());
         number = currentIndex = 1;
+
+        level = new TextView(Gdx.files.internal("fonts/liberation_serif.ttf"));
+        index = new TextView(Gdx.files.internal("fonts/liberation_serif.ttf"));
 
         if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
             indicator.clockwise = false;
@@ -74,8 +80,15 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         Gdx.gl.glClearColor(0.5f, 0.9f, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        checkOver();
+
         stage.act();
         stage.draw();
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
     }
 
     @Override
@@ -95,7 +108,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         initLens();
 
         cameraGroup.setSize(background.getWidth(), background.getHeight());
-        cameraGroup.setPosition(Constants.VIEWPORT_WIDTH / 2 - cameraGroup.getWidth() / 2, Constants.BACKGROUND_HEIGHT / 2 + cameraGroup.getHeight() / 4);
+        cameraGroup.setPosition(Constants.VIEWPORT_WIDTH / 2 - cameraGroup.getWidth() / 2, Constants.VIEWPORT_HEIGHT / 2 - cameraGroup.getHeight() / 2);
         cameraGroup.setOrigin(cameraGroup.getWidth() / 2, cameraGroup.getHeight() / 2);
 
         lens1.setCenterPosition(cameraGroup.getWidth(), cameraGroup.getHeight());
@@ -107,10 +120,10 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         cameraGroup.addActor(lens1);
         cameraGroup.addActor(lensGroup.getActors());
 
-        radius = Constants.LENS3_HEIGHT / 2;
+        radius = lens3.getHeight() / 2;
 
-        indicatorBeta = Math.toDegrees(Math.acos((2 * radius * radius - Constants.INDICATOR_WIDTH * Constants.INDICATOR_WIDTH) / (2 * radius * radius)));
-        dotBeta = Math.toDegrees(Math.acos((2 * radius * radius - Constants.DOT_WIDTH * Constants.DOT_WIDTH) / (2 * radius * radius)));
+        indicatorBeta = Math.toDegrees(Math.acos((2 * radius * radius - indicator.getWidth() * indicator.getWidth()) / (2 * radius * radius)));
+        dotBeta = Math.toDegrees(Math.acos((2 * radius * radius - dot.getWidth() * dot.getWidth()) / (2 * radius * radius)));
 
         cameraGroup.setOnShakeCompleteListener(this);
     }
@@ -119,13 +132,13 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     // Lens group includes indicator, dot, lens2, lens 3, lens4.
     private void initLens() {
         lensGroup = new ActorGroup();
-        lensGroup.setPosition(Constants.GROUP_LENS_X, Constants.GROUP_LENS_Y);
 
         lens2 = new Lens(atlas.findRegion("lens2"));
         lens3 = new Lens(atlas.findRegion("lens3"));
         lens4 = new Lens(atlas.findRegion("lens4"));
 
         lensGroup.setSize(lens2.getWidth(), lens2.getHeight());
+        lensGroup.setPosition(cameraGroup.getWidth() / 2 - lensGroup.getWidth() / 2, cameraGroup.getHeight() / 2 - lensGroup.getHeight() / 2);
 
         lens2.setCenterPosition(lensGroup.getWidth(), lensGroup.getHeight());
         lens3.setCenterPosition(lensGroup.getWidth(), lensGroup.getHeight());
@@ -187,13 +200,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                     deltaIndicatorRotation = indicator.getRotation();
                 }
 
-//                if (indicator.clockwise) {
-//                    if (deltaIndicatorRotation > dot.getRotation()) {
-//                        deltaIndicatorRotation -= indicatorBeta / 2;
-//                    } else {
-//                        deltaIndicatorRotation -= indicatorBeta / 2;
-//                    }
-//                } else {
                 if (deltaIndicatorRotation < dot.getRotation()) {
                     deltaIndicatorRotation += indicatorBeta / 2;
                 } else {
@@ -209,6 +215,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 if (deltaIndicatorRotation >= bound1 && deltaIndicatorRotation <= bound2) {
                     currentIndex--;
                     if (currentIndex != 0) {
+                        SoundHelper.getInstance().makeSound(Gdx.files.internal("sounds/bleep.mp3"));
+                        SoundHelper.getInstance().playSound();
                         dot.setRotation(randomRotation(dot.getRotation()));
                         if (indicator.clockwise) {
                             indicator.clockwise = false;
@@ -216,18 +224,13 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                             indicator.clockwise = true;
                         }
                     } else {
-                        number++;
-                        currentIndex = number;
-                        nextLevel = true;
-                        indicator.isMoving = false;
+                        stopGame(1);
                     }
                     BaseLog.tingTing();
                 } else {
-                    indicator.isMoving = false;
-                    playAgain = true;
+                    stopGame(2);
                 }
             }
-//            cameraGroup.shake();
 //            cameraButton.press();
 //            indicator.isMoving = false;
         }
@@ -256,7 +259,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public void onShakeComplete() {
-        Gdx.app.log(Constants.APP_TITLE, "Complete");
+
     }
 
     private void initDotRotation() {
@@ -282,5 +285,59 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
             tmp -= 360;
         }
         return tmp;
+    }
+
+    // situation: 1-win; 2-lose
+    private void stopGame(int situation) {
+        switch (situation) {
+            case 1:
+                number++;
+                nextLevel = true;
+                break;
+            case 2:
+                playAgain = true;
+                SoundHelper.getInstance().makeSound(Gdx.files.internal("sounds/fail.wav"));
+                SoundHelper.getInstance().playSound();
+                cameraGroup.shake();
+                break;
+        }
+        currentIndex = number;
+        indicator.isMoving = false;
+    }
+
+    private void checkOver() {
+        if (indicator.isMoving) {
+            double deltaIndicatorRotation;
+            double bound1 = dot.getRotation() - dotBeta / 2;
+            double bound2 = dot.getRotation() + dotBeta / 2;
+
+            if (indicator.clockwise) {
+                if (indicator.getRotation() > 0) {
+                    deltaIndicatorRotation = indicator.getRotation();
+                } else {
+                    deltaIndicatorRotation = 360 + indicator.getRotation();
+                }
+                if (isSameSide(deltaIndicatorRotation, dot.getRotation())) {
+                    if ((deltaIndicatorRotation + indicatorBeta / 2) < bound1) {
+                        stopGame(2);
+                    }
+                }
+            } else {
+                if (indicator.getRotation() >= 0) {
+                    deltaIndicatorRotation = indicator.getRotation();
+                } else {
+                    deltaIndicatorRotation = 360 + indicator.getRotation();
+                }
+                if (isSameSide(deltaIndicatorRotation, dot.getRotation())) {
+                    if ((deltaIndicatorRotation - indicatorBeta / 2) > bound2) {
+                        stopGame(2);
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean isSameSide(double angle1, float angle2) {
+        return ((angle1 >= 0 && angle2 >= 0 && angle1 <= 180 && angle2 <= 180) || (angle1 > 180 && angle2 > 180 && angle1 < 360 && angle2 < 360));
     }
 }

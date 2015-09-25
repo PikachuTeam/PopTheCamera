@@ -32,4 +32,16 @@ public class BaseLog {
             Gdx.app.log(Constants.APP_TITLE, "Ting ting.");
         }
     }
+
+    public static void printString(String msg) {
+        if (enableLog) {
+            Gdx.app.log(Constants.APP_TITLE, msg);
+        }
+    }
+
+    public static void checkX(String object, float x) {
+        if (enableLog) {
+            Gdx.app.log(Constants.APP_TITLE, object + ": " + x);
+        }
+    }
 }
