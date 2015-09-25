@@ -56,7 +56,7 @@ public class ActorGroup {
 
         RotateToAction action2 = new RotateToAction();
         action2.setRotation(-Constants.BACKGROUND_ROTATION);
-        action2.setDuration(Constants.ROTATION_DURATION);
+        action2.setDuration(Constants.ROTATION_DURATION * 2);
 
         RotateToAction action3 = new RotateToAction() {
             @Override

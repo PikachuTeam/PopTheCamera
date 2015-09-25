@@ -12,8 +12,8 @@ public class Constants {
     public final static int SCREEN_WIDTH = 768 / 2;
     public final static int SCREEN_HEIGHT = 1280 / 2;
 
-    public final static float VIEWPORT_WIDTH = 1152f;
-    public final static float VIEWPORT_HEIGHT = 1920f;
+    public final static float VIEWPORT_WIDTH = 768 * 1.5f;
+    public final static float VIEWPORT_HEIGHT = 1280 * 1.5f;
 
     public final static float BACKGROUND_ROTATION = 2f;
     public final static float BACKGROUND_WIDTH = 900f;
@@ -42,7 +42,7 @@ public class Constants {
     public final static float LENS4_X = LENS2_WIDTH / 2 - LENS4_WIDTH / 2;
     public final static float LENS4_Y = LENS2_HEIGHT / 2 - LENS4_HEIGHT / 2;
 
-    public final static float ROTATION_DURATION = 0.3f;
+    public final static float ROTATION_DURATION = 0.1f;
 
     public final static float INDICATOR_WIDTH = 20f;
     public final static float INDICATOR_HEIGHT = LENS2_HEIGHT / 2 - LENS3_HEIGHT / 2 - 3;
@@ -62,4 +62,5 @@ public class Constants {
     public final static float CAMERA_BUTTON_HEIGHT = 40f;
     public final static float CAMERA_BUTTON_X = 100f;
     public final static float CAMERA_BUTTON_Y = BACKGROUND_HEIGHT - 90f;
+
 }
