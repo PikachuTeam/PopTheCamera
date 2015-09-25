@@ -65,7 +65,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         // Set up camera group. Camera group includes camera_button, background, lens1, lensGroup.
         cameraGroup = new ActorGroup();
         cameraGroup.setSize(Constants.BACKGROUND_WIDTH, Constants.BACKGROUND_HEIGHT);
-        cameraGroup.setPosition(Constants.VIEWPORT_WIDTH / 2 - cameraGroup.getWidth() / 2, Constants.BACKGROUND_HEIGHT / 2 - cameraGroup.getHeight() / 2);
+        cameraGroup.setPosition(Constants.VIEWPORT_WIDTH / 2 - cameraGroup.getWidth() / 2, Constants.BACKGROUND_HEIGHT / 2 + cameraGroup.getHeight() / 4);
         cameraGroup.setOrigin(cameraGroup.getWidth() / 2, cameraGroup.getHeight() / 2);
 
         background = new Background(atlas.findRegion("camera"), Constants.BACKGROUND_WIDTH, Constants.BACKGROUND_HEIGHT, 0, 0);

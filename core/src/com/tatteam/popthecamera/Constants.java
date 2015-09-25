@@ -12,8 +12,8 @@ public class Constants {
     public final static int SCREEN_WIDTH = 768 / 2;
     public final static int SCREEN_HEIGHT = 1280 / 2;
 
-    public final static float VIEWPORT_WIDTH = 1012f;
-    public final static float VIEWPORT_HEIGHT = 905f;
+    public final static float VIEWPORT_WIDTH = 1152f;
+    public final static float VIEWPORT_HEIGHT = 1920f;
 
     public final static float BACKGROUND_ROTATION = 2f;
     public final static float BACKGROUND_WIDTH = 900f;
