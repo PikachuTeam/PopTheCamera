@@ -1,0 +1,76 @@
+
+pop_the_camera.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+camera
+  rotate: false
+  xy: 1, 116
+  size: 1012, 905
+  orig: 1012, 905
+  offset: 0, 0
+  index: -1
+camera_button
+  rotate: false
+  xy: 1, 86
+  size: 125, 28
+  orig: 125, 28
+  offset: 0, 0
+  index: -1
+indicator
+  rotate: false
+  xy: 1, 1
+  size: 27, 83
+  orig: 27, 83
+  offset: 0, 0
+  index: -1
+dot
+  rotate: false
+  xy: 30, 32
+  size: 52, 52
+  orig: 52, 52
+  offset: 0, 0
+  index: -1
+
+pop_the_camera2.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+lens1
+  rotate: false
+  xy: 1, 1
+  size: 778, 775
+  orig: 778, 775
+  offset: 0, 0
+  index: -1
+
+pop_the_camera3.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+lens2
+  rotate: false
+  xy: 1, 252
+  size: 588, 588
+  orig: 588, 588
+  offset: 0, 0
+  index: -1
+lens4
+  rotate: false
+  xy: 1, 1
+  size: 249, 249
+  orig: 249, 249
+  offset: 0, 0
+  index: -1
+
+pop_the_camera4.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+lens3
+  rotate: false
+  xy: 1, 1
+  size: 433, 433
+  orig: 433, 433
+  offset: 0, 0
+  index: -1
