@@ -7,12 +7,15 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.compression.lzma.Base;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.tatteam.popthecamera.actors.Background;
 import com.tatteam.popthecamera.actors.CameraButton;
 import com.tatteam.popthecamera.actors.Dot;
 import com.tatteam.popthecamera.actors.Indicator;
 import com.tatteam.popthecamera.actors.Lens;
+
+import java.util.Random;
 
 public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener {
 
@@ -29,10 +32,22 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     private Lens lens3;
     private Lens lens4;
     private CameraButton cameraButton;
+    private int number;
+    private int currentIndex;
+    private double indicatorBeta;
+    private double dotBeta;
+    private float radius;
+    private Random random;
+    private boolean playAgain = false;
+    private boolean nextLevel = false;
 
     @Override
     public void create() {
 //        camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
+        BaseLog.enableLog = true;
+
+        random = new Random();
+
         stage = new Stage(new FitViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT));
         stage.getViewport().apply();
 //        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
@@ -41,7 +56,16 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
         init();
 
+        initDotRotation();
+
         stage.addActor(cameraGroup.getActors());
+        number = currentIndex = 1;
+
+        if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
+            indicator.clockwise = false;
+        } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
+            indicator.clockwise = true;
+        }
 
         Gdx.input.setInputProcessor(this);
     }
@@ -78,6 +102,14 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         cameraGroup.addActor(lens1);
         cameraGroup.addActor(lensGroup.getActors());
 
+        radius = Constants.LENS3_HEIGHT / 2;
+
+        indicatorBeta = Math.toDegrees(Math.acos((2 * radius * radius - Constants.INDICATOR_WIDTH * Constants.INDICATOR_WIDTH) / (2 * radius * radius)));
+        dotBeta = Math.toDegrees(Math.acos((2 * radius * radius - Constants.DOT_WIDTH * Constants.DOT_WIDTH) / (2 * radius * radius)));
+
+        BaseLog.checkBeta(indicatorBeta);
+        BaseLog.checkBeta(dotBeta);
+
         cameraGroup.setOnShakeCompleteListener(this);
     }
 
@@ -99,7 +131,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         lensGroup.addActor(lens4);
         lensGroup.addActor(dot);
         lensGroup.addActor(indicator);
-        dot.setRotation(30);
     }
 
     @Override
@@ -119,8 +150,58 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        cameraGroup.shake();
-        cameraButton.press();
+
+        if (nextLevel) {
+            indicator.setRotation(0);
+            initDotRotation();
+            nextLevel = false;
+            indicator.resetAngle();
+        } else {
+            if (!indicator.isMoving) {
+                indicator.isMoving = true;
+            } else {
+                double deltaIndicatorRotation = 0;
+                double bound1 = dot.getRotation() - dotBeta / 2;
+                double bound2 = dot.getRotation() + dotBeta / 2;
+
+                if (indicator.getRotation() < 0) {
+                    deltaIndicatorRotation = 360 + indicator.getRotation();
+                } else {
+                    deltaIndicatorRotation = indicator.getRotation();
+                }
+
+                if (indicator.getRotation() > dot.getRotation()) {
+                    deltaIndicatorRotation -= indicatorBeta / 2;
+                } else {
+                    deltaIndicatorRotation += indicatorBeta / 2;
+                }
+
+                BaseLog.checkRotation("Delta Indicator Rotation", deltaIndicatorRotation);
+                BaseLog.checkRotation("bound 1", bound1);
+                BaseLog.checkRotation("bound 2", bound2);
+
+                if (deltaIndicatorRotation >= bound1 && deltaIndicatorRotation <= bound2) {
+                    currentIndex--;
+                    if (currentIndex != 0) {
+                        dot.setRotation(randomRotation(dot.getRotation()));
+                        if (indicator.clockwise) {
+                            indicator.clockwise = false;
+                        } else {
+                            indicator.clockwise = true;
+                        }
+                    } else {
+                        number++;
+                        currentIndex = number;
+                        nextLevel = true;
+                        indicator.isMoving = false;
+                    }
+                    BaseLog.tingTing();
+                }
+            }
+//            cameraGroup.shake();
+//            cameraButton.press();
+//            indicator.isMoving = false;
+        }
         return false;
     }
 
@@ -147,5 +228,30 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public void onShakeComplete() {
         Gdx.app.log(Constants.APP_TITLE, "Complete");
+    }
+
+    private void initDotRotation() {
+        int type = random.nextInt(2);
+        if (type == 0) {
+            dot.setRotation(random.nextInt(60) + 30);
+        } else {
+            dot.setRotation(random.nextInt(60) + 270);
+        }
+    }
+
+    private float randomRotation(float currentRotation) {
+        float tmp;
+        int rnd = random.nextInt(30) + 50;
+        if (indicator.clockwise) {
+            tmp = currentRotation + rnd;
+        } else {
+            tmp = currentRotation - rnd;
+        }
+        if (tmp < 0) {
+            tmp += 360;
+        } else if (tmp > 360) {
+            tmp -= 360;
+        }
+        return tmp;
     }
 }

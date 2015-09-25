@@ -51,12 +51,12 @@ public class Constants {
     public final static float INDICATOR_ORIGIN_X = INDICATOR_WIDTH / 2;
     public final static float INDICATOR_ORIGIN_Y = -LENS3_HEIGHT / 2;
 
-    public final static float DOT_WIDTH = (LENS2_HEIGHT / 2 - LENS3_HEIGHT / 2) / 2;
-    public final static float DOT_HEIGHT = DOT_WIDTH;
+    public final static float DOT_WIDTH = 50f;
+    public final static float DOT_HEIGHT = 50f;
     public final static float DOT_X = LENS2_WIDTH / 2 - DOT_WIDTH / 2;
-    public final static float DOT_Y = LENS2_HEIGHT - DOT_HEIGHT - DOT_HEIGHT / 2f;
-    public final static float DOT_ORIGIN_X = INDICATOR_ORIGIN_X;
-    public final static float DOT_ORIGIN_Y = INDICATOR_ORIGIN_Y;
+    public final static float DOT_Y = LENS2_HEIGHT - DOT_HEIGHT - 15f;
+    public final static float DOT_ORIGIN_X = DOT_WIDTH / 2;
+    public final static float DOT_ORIGIN_Y = -LENS3_HEIGHT / 2 - 10f;
 
     public final static float CAMERA_BUTTON_WIDTH = 100f;
     public final static float CAMERA_BUTTON_HEIGHT = 40f;
