@@ -17,9 +17,7 @@ import com.tatteam.popthecamera.actors.Indicator;
 import com.tatteam.popthecamera.actors.Lens;
 import com.tatteam.popthecamera.actors.TextView;
 
-import java.util.Random;
-
-public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener,AlphaRectangle.OnDisappearListener {
+public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener {
 
     private Indicator indicator;
     private Dot dot;
@@ -38,7 +36,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     private double indicatorBeta;
     private double dotBeta;
     private float radius;
-    private Random random;
     private boolean playAgain = false;
     private TextView level;
     private TextView index;
@@ -53,8 +50,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public void create() {
         BaseLog.enableLog = true;
-
-        random = new Random();
 
         rectangle = new AlphaRectangle();
         rectangle.setOnDisappearListener(this);
@@ -99,8 +94,9 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public void render() {
-//        Gdx.gl.glClearColor(0f, 96f/255f, 100/255f, 1);
+//        Gdx.gl.glClearColor(18 / 255f, 204 / 255f, 126 / 255f, 1);
         Gdx.gl.glClearColor(currentBackgroundColor.r, currentBackgroundColor.g, currentBackgroundColor.b, currentBackgroundColor.a);
+//        Gdx.gl.glClearColor(ColorHelper.getInstance().testColor.getRed()/255f, ColorHelper.getInstance().testColor.getGreen()/255f, ColorHelper.getInstance().testColor.getBlue()/255f, ColorHelper.getInstance().testColor.getAlpha()/255f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         checkOver();
@@ -303,7 +299,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public void onShakeComplete() {
-
+        touchable = true;
     }
 
     // situation: 1-win; 2-lose

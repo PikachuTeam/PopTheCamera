@@ -14,12 +14,7 @@ public class Lens extends Actor {
 
     public Lens(TextureRegion lens) {
         this.lens = new TextureRegion(lens);
-        setBounds(getX(), getY(), lens.getRegionWidth(), lens.getRegionHeight());
-    }
-
-    public Lens(TextureRegion lens, float width, float height, float x, float y) {
-        this.lens = new TextureRegion(lens);
-        setBounds(x, y, width, height);
+        setBounds(getX(), getY(), this.lens.getRegionWidth(), this.lens.getRegionHeight());
     }
 
     public void setCenterPosition(float parentWidth, float parentHeight) {
