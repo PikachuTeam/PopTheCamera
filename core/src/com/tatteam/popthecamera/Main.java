@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -18,7 +19,7 @@ import com.tatteam.popthecamera.actors.TextView;
 
 import java.util.Random;
 
-public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener {
+public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener,AlphaRectangle.OnDisappearListener {
 
     private Indicator indicator;
     private Dot dot;
@@ -39,13 +40,15 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     private float radius;
     private Random random;
     private boolean playAgain = false;
-    private boolean nextLevel = false;
     private TextView level;
     private TextView index;
     private AlphaRectangle rectangle;
     private Sound successSound;
     private Sound failSound;
     private Sound finishLevelSound;
+    private double e;
+    public static boolean touchable = true;
+    private Color currentBackgroundColor;
 
     @Override
     public void create() {
@@ -54,26 +57,36 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         random = new Random();
 
         rectangle = new AlphaRectangle();
+        rectangle.setOnDisappearListener(this);
 
         stage = new Stage(new FitViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT));
         stage.getViewport().apply();
 
         atlas = new TextureAtlas(Gdx.files.internal("images/large/pop_the_camera.pack"));
 
+        ColorHelper.getInstance().initColor();
+        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(0);
+
         init();
 
-        initDotRotation();
+        dot.initPosition();
 
         stage.addActor(cameraGroup.getActors());
         number = currentIndex = 1;
 
-        level = new TextView(Gdx.files.internal("fonts/liberation_serif.ttf"));
-        index = new TextView(Gdx.files.internal("fonts/liberation_serif.ttf"));
-        level.setText("" + number);
-        index.setText("" + index);
+        level = new TextView(Gdx.files.internal("fonts/bariol_regular.otf"));
+        index = new TextView(Gdx.files.internal("fonts/bariol_regular.otf"));
+        level.setText("Level " + number);
+        index.setText("" + currentIndex);
 
         stage.addActor(level);
         stage.addActor(index);
+
+        level.setFontSize(250);
+        index.setFontSize(400);
+
+        level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 4 - level.getHeight() / 4);
+        index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth(), 3 * stage.getViewport().getWorldHeight() / 4 + 1.2f * index.getHeight());
 
         if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
             indicator.clockwise = false;
@@ -86,8 +99,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public void render() {
-        Gdx.gl.glClearColor(0f, 96f/255f, 100/255f, 1);
-
+//        Gdx.gl.glClearColor(0f, 96f/255f, 100/255f, 1);
+        Gdx.gl.glClearColor(currentBackgroundColor.r, currentBackgroundColor.g, currentBackgroundColor.b, currentBackgroundColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         checkOver();
@@ -100,6 +113,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     public void dispose() {
         disposeSound();
         stage.dispose();
+        ColorHelper.getInstance().dispose();
         super.dispose();
     }
 
@@ -168,12 +182,18 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         dot.setPosition(lens1.getWidth() / 2 - dot.getWidth() / 2, (lens1.getHeight() - lens2.getHeight()) / 2 + lens2.getHeight() - dot.getHeight() - offset2 / 2);
         dot.setOrigin(dot.getWidth() / 2, -(lens3.getHeight() / 2) - offset2 / 2);
 
+        // set color
+        ColorHelper.getInstance().setColor(lens2, lens3, lens4);
+
         lensGroup.addActor(lens1);
         lensGroup.addActor(lens2);
         lensGroup.addActor(lens3);
         lensGroup.addActor(lens4);
         lensGroup.addActor(dot);
         lensGroup.addActor(indicator);
+
+        double distance = Math.sqrt((indicator.getOriginX() - dot.getOriginX()) * (indicator.getOriginX() - dot.getOriginX()) + (indicator.getOriginY() - dot.getOriginY()) * (indicator.getOriginY() - dot.getOriginY()));
+        e = distance - (int) distance;
     }
 
     @Override
@@ -193,58 +213,68 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (nextLevel || playAgain) {
-            indicator.setRotation(0);
-            initDotRotation();
-            nextLevel = false;
-            playAgain = false;
-            indicator.resetAngle();
-            if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
-                indicator.clockwise = false;
-            } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
-                indicator.clockwise = true;
-            }
-        } else {
-            if (!indicator.isMoving) {
-                indicator.isMoving = true;
+        if (touchable) {
+            if (playAgain) {
+                indicator.setRotation(0);
+                dot.initPosition();
+                playAgain = false;
+                index.setText("" + currentIndex);
+                indicator.resetAngle();
+                if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
+                    indicator.clockwise = false;
+                } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
+                    indicator.clockwise = true;
+                }
             } else {
-                double indicationRotation = recalculateAngleIfNeed(indicator.getRotation());
-                double delta;
-
-                if (indicator.clockwise) {
-                    if (indicationRotation == 0) {
-                        indicationRotation = 360;
-                    }
-                }
-                if (isSameSide(indicationRotation, dot.getRotation())) {
-                    if (indicationRotation >= dot.getRotation()) {
-                        delta = indicationRotation - dot.getRotation();
-                    } else {
-                        delta = -indicationRotation + dot.getRotation();
-                    }
+                if (!indicator.isMoving) {
+                    indicator.isMoving = true;
                 } else {
-                    if (indicationRotation >= dot.getRotation()) {
-                        delta = 360 - indicationRotation + dot.getRotation();
-                    } else {
-                        delta = 360 - dot.getRotation() + indicationRotation;
+                    double indicationRotation = recalculateAngleIfNeed(indicator.getRotation());
+                    double delta;
+
+                    if (indicator.clockwise) {
+                        if (indicationRotation == 0) {
+                            indicationRotation = 360;
+                        }
                     }
-                }
-                delta -= indicatorBeta / 6;
-                if (delta <= dotBeta / 2) {
-                    currentIndex--;
-                    successSound.play(0.5f);
-                    if (currentIndex != 0) {
-                        dot.setRotation(randomRotation(dot.getRotation()));
-                        if (indicator.clockwise) {
-                            indicator.clockwise = false;
+                    if (isSameSide(indicationRotation, dot.getRotation())) {
+                        if (indicationRotation >= dot.getRotation()) {
+                            delta = indicationRotation - dot.getRotation();
                         } else {
-                            indicator.clockwise = true;
+                            delta = -indicationRotation + dot.getRotation();
                         }
                     } else {
-                        stopGame(1);
+                        if (indicationRotation >= dot.getRotation()) {
+                            delta = 360 - indicationRotation + dot.getRotation();
+                        } else {
+                            delta = 360 - dot.getRotation() + indicationRotation;
+                        }
                     }
-                } else {
-                    stopGame(2);
+                    delta -= e;
+                    if (delta <= dotBeta / 2) {
+                        currentIndex--;
+                        index.setText("" + currentIndex);
+                        BaseLog.printString("Check over 1");
+                        BaseLog.checkRotation("Indicator Rotation", indicationRotation);
+                        BaseLog.checkRotation("Dot Rotation", dot.getRotation());
+                        BaseLog.checkRotation("Delta 2", delta);
+                        BaseLog.checkRotation("Dot beta", dotBeta / 2);
+                        BaseLog.checkRotation("Indicator beta", indicatorBeta / 8);
+                        BaseLog.printString("Ting ting.");
+                        successSound.play(0.5f);
+                        if (currentIndex != 0) {
+                            dot.randomPosition(indicator.clockwise);
+                            if (indicator.clockwise) {
+                                indicator.clockwise = false;
+                            } else {
+                                indicator.clockwise = true;
+                            }
+                        } else {
+                            stopGame(1);
+                        }
+                    } else {
+                        stopGame(2);
+                    }
                 }
             }
         }
@@ -276,37 +306,11 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     }
 
-    private void initDotRotation() {
-        int type = random.nextInt(2);
-        if (type == 0) {
-            dot.setRotation(random.nextInt(60) + 30);
-        } else {
-            dot.setRotation(random.nextInt(60) + 270);
-        }
-    }
-
-    private float randomRotation(float currentRotation) {
-        float tmp;
-        int rnd = random.nextInt(50) + 30;
-        if (indicator.clockwise) {
-            tmp = currentRotation + rnd;
-        } else {
-            tmp = currentRotation - rnd;
-        }
-        if (tmp < 0) {
-            tmp += 360;
-        } else if (tmp > 360) {
-            tmp -= 360;
-        }
-        return tmp;
-    }
-
     // situation: 1-win; 2-lose
     private void stopGame(int situation) {
         switch (situation) {
             case 1:
                 number++;
-                nextLevel = true;
                 cameraButton.press();
                 break;
             case 2:
@@ -343,8 +347,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                     delta = 360 - dot.getRotation() + indicationRotation;
                 }
             }
-            delta -= indicatorBeta / 6;
-
+            delta -= e;
             if (indicator.clockwise) {
                 if (isSameSide(indicationRotation, dot.getRotation())) {
                     if (indicationRotation < dot.getRotation()) {
@@ -355,6 +358,10 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                             BaseLog.checkRotation("Delta", delta);
                             BaseLog.checkRotation("Dot beta", dotBeta);
                             BaseLog.checkRotation("Indicator beta", indicatorBeta);
+                            BaseLog.checkRotation("Dot origin x:", dot.getOriginX());
+                            BaseLog.checkRotation("Dot origin y:", dot.getOriginY());
+                            BaseLog.checkRotation("Indicator origin x:", indicator.getOriginX());
+                            BaseLog.checkRotation("Indicator origin y:", indicator.getOriginY());
                             BaseLog.printString("Tach.");
                             stopGame(2);
                         }
@@ -368,6 +375,10 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                             BaseLog.checkRotation("Delta", delta);
                             BaseLog.checkRotation("Dot beta", dotBeta);
                             BaseLog.checkRotation("Indicator beta", indicatorBeta);
+                            BaseLog.checkRotation("Dot origin x:", dot.getOriginX());
+                            BaseLog.checkRotation("Dot origin y:", dot.getOriginY());
+                            BaseLog.checkRotation("Indicator origin x:", indicator.getOriginX());
+                            BaseLog.checkRotation("Indicator origin y:", indicator.getOriginY());
                             BaseLog.printString("Tach.");
                             stopGame(2);
                         }
@@ -383,6 +394,10 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                             BaseLog.checkRotation("Delta", delta);
                             BaseLog.checkRotation("Dot beta", dotBeta);
                             BaseLog.checkRotation("Indicator beta", indicatorBeta);
+                            BaseLog.checkRotation("Dot origin x:", dot.getOriginX());
+                            BaseLog.checkRotation("Dot origin y:", dot.getOriginY());
+                            BaseLog.checkRotation("Indicator origin x:", indicator.getOriginX());
+                            BaseLog.checkRotation("Indicator origin y:", indicator.getOriginY());
                             BaseLog.printString("Tach.");
                             stopGame(2);
                         }
@@ -396,7 +411,12 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                             BaseLog.checkRotation("Delta", delta);
                             BaseLog.checkRotation("Dot beta", dotBeta);
                             BaseLog.checkRotation("Indicator beta", indicatorBeta);
+                            BaseLog.checkRotation("Dot origin x:", dot.getOriginX());
+                            BaseLog.checkRotation("Dot origin y:", dot.getOriginY());
+                            BaseLog.checkRotation("Indicator origin x:", indicator.getOriginX());
+                            BaseLog.checkRotation("Indicator origin y:", indicator.getOriginY());
                             BaseLog.printString("Tach.");
+                            stopGame(2);
                         }
                     }
                 }
@@ -435,5 +455,26 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     public void onPressFinish() {
         finishLevelSound.play(0.2f);
         rectangle.appear(stage);
+    }
+
+    @Override
+    public void onDisappear(AlphaRectangle alphaRectangle) {
+        touchable = true;
+        alphaRectangle.getParent().removeActor(alphaRectangle);
+        indicator.resetAngle();
+        dot.initPosition();
+        level.setText("Level " + number);
+        index.setText("" + currentIndex);
+        playAgain = false;
+        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex());
+        ColorHelper.getInstance().setColor(lens2, lens3, lens4);
+//        lens2.setColor(1f, 1f, 1f, 1);
+        BaseLog.checkColor(lens3.getColor());
+        BaseLog.checkColor(currentBackgroundColor);
+        if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
+            indicator.clockwise = false;
+        } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
+            indicator.clockwise = true;
+        }
     }
 }

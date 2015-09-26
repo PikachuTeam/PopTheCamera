@@ -1,6 +1,7 @@
 package com.tatteam.popthecamera;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 
 /**
  * Created by dongc_000 on 9/25/2015.
@@ -48,6 +49,12 @@ public class BaseLog {
     public static void checkSwap(boolean isSwap) {
         if (enableLog) {
             Gdx.app.log(Constants.APP_TITLE, "Check swap: " + isSwap);
+        }
+    }
+
+    public static void checkColor(Color color) {
+        if (enableLog) {
+            Gdx.app.log(Constants.APP_TITLE, "Check color: " + color.r + " " + color.g + " " + color.b);
         }
     }
 }
