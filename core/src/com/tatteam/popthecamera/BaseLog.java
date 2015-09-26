@@ -44,4 +44,10 @@ public class BaseLog {
             Gdx.app.log(Constants.APP_TITLE, object + ": " + x);
         }
     }
+
+    public static void checkSwap(boolean isSwap) {
+        if (enableLog) {
+            Gdx.app.log(Constants.APP_TITLE, "Check swap: " + isSwap);
+        }
+    }
 }

@@ -4,9 +4,9 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.tatteam.popthecamera.actors.Background;
 import com.tatteam.popthecamera.actors.CameraButton;
@@ -19,7 +19,6 @@ import java.util.Random;
 
 public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener {
 
-    private OrthographicCamera camera;
     private Indicator indicator;
     private Dot dot;
     private Background background;
@@ -45,14 +44,12 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public void create() {
-//        camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
         BaseLog.enableLog = true;
 
         random = new Random();
 
         stage = new Stage(new FitViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT));
         stage.getViewport().apply();
-//        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
 
         atlas = new TextureAtlas(Gdx.files.internal("images/large/pop_the_camera.pack"));
 
@@ -65,6 +62,10 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
         level = new TextView(Gdx.files.internal("fonts/liberation_serif.ttf"));
         index = new TextView(Gdx.files.internal("fonts/liberation_serif.ttf"));
+        level.setText("" + number);
+        index.setText("" + index);
+        stage.addActor(level);
+        stage.addActor(index);
 
         if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
             indicator.clockwise = false;
@@ -94,13 +95,11 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height);
-//        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0f);
     }
 
     private void init() {
         // Set up camera group. Camera group includes camera_button, background, lens1, lensGroup.
         cameraGroup = new ActorGroup();
-
 
         background = new Background(atlas.findRegion("camera"));
         cameraButton = new CameraButton(atlas.findRegion("camera_button"));
@@ -193,12 +192,23 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 double deltaIndicatorRotation;
                 double bound1 = dot.getRotation() - dotBeta / 2;
                 double bound2 = dot.getRotation() + dotBeta / 2;
+//                if (bound1 < 0) {
+//                    double tmp = bound2;
+//                    bound2 = bound1 + 360;
+//                    bound1 = tmp;
+//                }
+//                if (bound2 >= 360) {
+//                    double tmp = bound1;
+//                    bound1 = bound2 - 360;
+//                    bound2 = tmp;
+//                }
 
-                if (indicator.getRotation() < 0) {
-                    deltaIndicatorRotation = 360 + indicator.getRotation();
-                } else {
-                    deltaIndicatorRotation = indicator.getRotation();
-                }
+                deltaIndicatorRotation = recalculateAngleIfNeed(indicator.getRotation());
+//                if (indicator.getRotation() < 0) {
+//                    deltaIndicatorRotation = 360 + indicator.getRotation();
+//                } else {
+//                    deltaIndicatorRotation = indicator.getRotation();
+//                }
 
                 if (deltaIndicatorRotation < dot.getRotation()) {
                     deltaIndicatorRotation += indicatorBeta / 2;
@@ -206,6 +216,9 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                     deltaIndicatorRotation -= indicatorBeta / 2;
                 }
 
+                deltaIndicatorRotation = recalculateAngleIfNeed(deltaIndicatorRotation);
+
+                BaseLog.printString("Touch.");
                 BaseLog.checkRotation("Indicator Rotation", indicator.getRotation());
                 BaseLog.checkRotation("Dot Rotation", dot.getRotation());
                 BaseLog.checkRotation("Delta Indicator Rotation", deltaIndicatorRotation);
@@ -231,8 +244,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                     stopGame(2);
                 }
             }
-//            cameraButton.press();
-//            indicator.isMoving = false;
         }
         return false;
     }
@@ -293,6 +304,11 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
             case 1:
                 number++;
                 nextLevel = true;
+                AlphaAction alphaAction = new AlphaAction();
+                alphaAction.setAlpha(2f);
+                alphaAction.setDuration(0.5f);
+                stage.addAction(alphaAction);
+                cameraButton.press();
                 break;
             case 2:
                 playAgain = true;
@@ -307,37 +323,125 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     private void checkOver() {
         if (indicator.isMoving) {
-            double deltaIndicatorRotation;
+            double deltaIndicatorRotation1;
+            double deltaIndicatorRotation2;
             double bound1 = dot.getRotation() - dotBeta / 2;
             double bound2 = dot.getRotation() + dotBeta / 2;
+            boolean isSwap = false;
+
+            if (bound1 < 0) {
+                double tmp = bound2;
+                bound2 = bound1 + 360;
+                bound1 = tmp;
+                isSwap = true;
+            }
+            if (bound2 >= 360) {
+                double tmp = bound1;
+                bound1 = bound2 - 360;
+                bound2 = tmp;
+                isSwap = true;
+            }
+
+            deltaIndicatorRotation1 = recalculateAngleIfNeed(indicator.getRotation());
+            deltaIndicatorRotation2 = recalculateAngleIfNeed(indicator.getRotation());
 
             if (indicator.clockwise) {
-                if (indicator.getRotation() > 0) {
-                    deltaIndicatorRotation = indicator.getRotation();
-                } else {
-                    deltaIndicatorRotation = 360 + indicator.getRotation();
-                }
-                if (isSameSide(deltaIndicatorRotation, dot.getRotation())) {
-                    if ((deltaIndicatorRotation + indicatorBeta / 2) < bound1) {
-                        stopGame(2);
-                    }
-                }
+                deltaIndicatorRotation1 -= indicatorBeta / 2;
+                deltaIndicatorRotation1 = recalculateAngleIfNeed(deltaIndicatorRotation1);
+//                if (isSameSide(deltaIndicatorRotation1, dot.getRotation())) {
+
+//                if (isSwap) {
+//                    if (bound2 - deltaIndicatorRotation1 > 0) {
+//                        BaseLog.printString("Check over 1.");
+//                        BaseLog.checkRotation("Indicator Rotation", indicator.getRotation());
+//                        BaseLog.checkRotation("Dot Rotation", dot.getRotation());
+//                        BaseLog.checkRotation("Delta Indicator Rotation 1", deltaIndicatorRotation1);
+//                        BaseLog.checkRotation("Delta Indicator Rotation 2", deltaIndicatorRotation2);
+//                        BaseLog.checkRotation("Bound 1", bound1);
+//                        BaseLog.checkRotation("Bound 2", bound2);
+//                        BaseLog.checkSwap(isSwap);
+//                        if (deltaIndicatorRotation2 + dot.getRotation() > 360) {
+//                            if (deltaIndicatorRotation2 < bound2) {
+//                                stopGame(2);
+//                            }
+//                        }
+//                    }
+//                } else {
+//                    if (isSameSide(deltaIndicatorRotation1, dot.getRotation())) {
+//                        if (deltaIndicatorRotation1 < dot.getRotation()) {
+//                            deltaIndicatorRotation2 += indicatorBeta / 2;
+////                    deltaIndicatorRotation2 = recalculateAngleIfNeed(deltaIndicatorRotation2);
+//                            BaseLog.printString("Check over 1.");
+//                            BaseLog.checkRotation("Indicator Rotation", indicator.getRotation());
+//                            BaseLog.checkRotation("Dot Rotation", dot.getRotation());
+//                            BaseLog.checkRotation("Delta Indicator Rotation 1", deltaIndicatorRotation1);
+//                            BaseLog.checkRotation("Delta Indicator Rotation 2", deltaIndicatorRotation2);
+//                            BaseLog.checkRotation("Bound 1", bound1);
+//                            BaseLog.checkRotation("Bound 2", bound2);
+//                            BaseLog.checkSwap(isSwap);
+////                        if (isSwap) {
+////                            if (deltaIndicatorRotation2 + dot.getRotation() > 360) {
+////                                if (deltaIndicatorRotation2 < bound2) {
+////                                    stopGame(2);
+////                                }
+////                            }
+////                        } else {
+//                            if (deltaIndicatorRotation2 < bound1) {
+//                                stopGame(2);
+//                            }
+////                        }
+////                    }
+//                        }
+//                    }
+//                }
+
             } else {
-                if (indicator.getRotation() >= 0) {
-                    deltaIndicatorRotation = indicator.getRotation();
-                } else {
-                    deltaIndicatorRotation = 360 + indicator.getRotation();
+                deltaIndicatorRotation1 += indicatorBeta / 2;
+                deltaIndicatorRotation1 = recalculateAngleIfNeed(deltaIndicatorRotation1);
+                if (Math.abs(indicator.getRotation() - dot.getRotation()) < indicatorBeta + dotBeta / 2) {
+
                 }
-                if (isSameSide(deltaIndicatorRotation, dot.getRotation())) {
-                    if ((deltaIndicatorRotation - indicatorBeta / 2) > bound2) {
-                        stopGame(2);
-                    }
-                }
+//                if (isSameSide(deltaIndicatorRotation1, dot.getRotation()))
+//                    if (Math.abs(deltaIndicatorRotation1 - dot.getRotation()) > dotBeta / 2) {
+////                    if (deltaIndicatorRotation1 > dot.getRotation()) {
+//                        deltaIndicatorRotation2 -= indicatorBeta / 2;
+//                        BaseLog.printString("Check over 2.");
+//                        BaseLog.checkRotation("Indicator Rotation", indicator.getRotation());
+//                        BaseLog.checkRotation("Dot Rotation", dot.getRotation());
+//                        BaseLog.checkRotation("Delta Indicator Rotation 1", deltaIndicatorRotation1);
+//                        BaseLog.checkRotation("Delta Indicator Rotation 2", deltaIndicatorRotation2);
+//                        BaseLog.checkRotation("Bound 1", bound1);
+//                        BaseLog.checkRotation("Bound 2", bound2);
+//                        if (isSameSide(deltaIndicatorRotation2, bound2)) {
+//                            if (deltaIndicatorRotation2 > bound2) {
+//                                stopGame(2);
+//                            }
+//                        } else {
+//                            if (deltaIndicatorRotation1 > bound2) {
+//                                stopGame(2);
+//                            }
+//                        }
+//                    }
             }
         }
     }
 
-    private boolean isSameSide(double angle1, float angle2) {
+    private boolean isSameSide(double angle1, double angle2) {
         return ((angle1 >= 0 && angle2 >= 0 && angle1 <= 180 && angle2 <= 180) || (angle1 > 180 && angle2 > 180 && angle1 < 360 && angle2 < 360));
+    }
+
+    private boolean isDifferentSide(double angle1, float angle2) {
+        return ((angle1 > 180 && angle2 >= 0 && angle1 < 360 && angle2 <= 180) || (angle1 >= 0 && angle2 > 180 && angle1 <= 180 && angle2 < 360));
+    }
+
+    private double recalculateAngleIfNeed(double angle) {
+        double tmp = angle;
+        if (angle < 0) {
+            tmp = 360 + angle;
+        }
+        if (angle >= 360) {
+            tmp = angle - 360;
+        }
+        return tmp;
     }
 }
