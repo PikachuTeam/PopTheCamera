@@ -3,7 +3,6 @@ package com.tatteam.popthecamera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-
 /**
  * Created by the_e_000 on 9/26/2015.
  */
@@ -15,13 +14,11 @@ public class ColorHelper {
     private Color[] darkestColor;
     private int index;
     private int length;
-    public java.awt.Color testColor;
 
     private ColorHelper() {
     }
 
     public void initColor() {
-        testColor = java.awt.Color.decode("0x16FF9E");
         brightestColor = new Color[]{
                 new Color(0, 131f / 255f, 143f / 255f, 1),
                 new Color(0x00838F),

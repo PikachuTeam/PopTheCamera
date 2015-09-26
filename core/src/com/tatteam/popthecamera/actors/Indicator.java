@@ -20,7 +20,7 @@ public class Indicator extends Actor {
 
     public Indicator(TextureRegion indicator) {
 //        this.indicator = new Te(Gdx.files.internal("images/large/indicator.png"));
-        this.indicator=new TextureRegion(new Texture(Gdx.files.internal("images/large/indicator.png")));
+        this.indicator = new TextureRegion(new Texture(Gdx.files.internal("images/large/indicator.png")));
         setBounds(getX(), getY(), this.indicator.getRegionWidth(), this.indicator.getRegionHeight());
         accelerator = 1;
     }
@@ -35,6 +35,7 @@ public class Indicator extends Actor {
 
     public void resetAngle() {
         angle = 0;
+        setRotation(angle);
     }
 
     @Override
