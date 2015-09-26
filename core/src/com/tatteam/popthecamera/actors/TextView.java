@@ -1,6 +1,7 @@
 package com.tatteam.popthecamera.actors;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -21,9 +22,10 @@ public class TextView extends Actor {
         text = "";
         generator = new FreeTypeFontGenerator(fontFile);
         parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 16;
+        parameter.color = new Color(1, 1, 1, 1);
         font = generator.generateFont(parameter);
     }
-
     public void setFontSize(int fontSize) {
         parameter.size = fontSize;
         font = generator.generateFont(parameter);
@@ -48,6 +50,6 @@ public class TextView extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        font.draw(batch, text, getX(), getY());
+        font.draw(batch, text, 0, 0);
     }
 }
