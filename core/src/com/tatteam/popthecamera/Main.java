@@ -49,6 +49,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     public static boolean touchable = true;
     private Color currentBackgroundColor;
     private Button soundButton;
+    private Button vibrationButton;
     private Vector3 touchPoint;
     private Preferences preferences;
 
@@ -217,7 +218,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
             camera.unproject(touchPoint.set(screenX, screenY, 0));
             if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
                 soundButton.setImage("press_sound");
-                Log.writeLog("Touch sound button");
+            } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
+                vibrationButton.setImage("press_vibrate");
             } else if (playAgain) {
                 indicator.setRotation(0);
                 dot.initPosition();
@@ -297,6 +299,14 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 soundButton.setImage("on_sound");
             }
             Log.writeLog("Release sound button");
+        } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
+            if (VibrationHelper.enableVibration) {
+                vibrationButton.setImage("off_vibrate");
+                VibrationHelper.enableVibration = false;
+            } else {
+                vibrationButton.setImage("on_vibrate");
+                VibrationHelper.enableVibration = true;
+            }
         }
         return false;
     }
@@ -334,6 +344,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 cameraGroup.shake();
                 SoundHelper.getInstance().playFailSound();
                 touchable = false;
+                VibrationHelper.vibrate(1);
                 currentBackgroundColor = ColorHelper.FAIL_COLOR;
                 break;
         }
@@ -479,15 +490,20 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     }
 
     private void initButton() {
-        if (SoundHelper.getInstance().enableSound) {
-            if (SoundHelper.enableSound) {
-                soundButton = new Button(atlas, "on_sound");
-            } else {
-                soundButton = new Button(atlas, "off_sound");
-            }
-            soundButton.setPosition(stage.getViewport().getWorldWidth() - 3 * soundButton.getWidth() / 2f, stage.getViewport().getWorldHeight() - 3 * soundButton.getHeight() / 2f);
-            soundButton.addTo(stage);
+        if (SoundHelper.enableSound) {
+            soundButton = new Button(atlas, "on_sound");
+        } else {
+            soundButton = new Button(atlas, "off_sound");
         }
+        soundButton.setPosition(stage.getViewport().getWorldWidth() - 3 * soundButton.getWidth() / 2f, stage.getViewport().getWorldHeight() - 3 * soundButton.getHeight() / 2f);
+        soundButton.addTo(stage);
+        if (VibrationHelper.enableVibration) {
+            vibrationButton = new Button(atlas, "on_vibrate");
+        } else {
+            vibrationButton = new Button(atlas, "off_vibrate");
+        }
+        vibrationButton.setPosition(soundButton.getX() - 5 * vibrationButton.getWidth() / 4, soundButton.getY());
+        vibrationButton.addTo(stage);
     }
 
     private void loadData() {
@@ -495,6 +511,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         number = preferences.getInteger("number", 1);
         currentIndex = number;
         SoundHelper.enableSound = preferences.getBoolean("sound", true);
+        VibrationHelper.enableVibration = preferences.getBoolean("vibration", true);
     }
 
     private void saveData() {
@@ -502,5 +519,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
         preferences.putInteger("number", number);
         preferences.putBoolean("sound", SoundHelper.enableSound);
+        preferences.putBoolean("vibration", VibrationHelper.enableVibration);
     }
 }
