@@ -345,6 +345,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 SoundHelper.getInstance().playFailSound();
                 touchable = false;
                 VibrationHelper.vibrate(1);
+//                dot.scaleTo(dot.getX(), dot.getY(), 0.5f);
                 currentBackgroundColor = ColorHelper.FAIL_COLOR;
                 break;
         }
@@ -520,5 +521,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         preferences.putInteger("number", number);
         preferences.putBoolean("sound", SoundHelper.enableSound);
         preferences.putBoolean("vibration", VibrationHelper.enableVibration);
+        preferences.flush();
     }
 }

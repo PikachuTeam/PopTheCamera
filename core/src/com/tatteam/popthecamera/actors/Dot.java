@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.ScaleToAction;
 
 import java.util.Random;
 
@@ -48,6 +49,15 @@ public class Dot extends Actor {
             rotation -= 360;
         }
         setRotation(rotation);
+    }
+
+    public void scaleTo(float x, float y, float aspectRatio) {
+        ScaleToAction action = new ScaleToAction();
+//        action.setScale(0.5f);
+        action.setX(x);
+        action.setY(y);
+        action.setDuration(1f);
+        addAction(action);
     }
 
     @Override
