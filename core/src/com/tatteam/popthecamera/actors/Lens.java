@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.tatteam.popthecamera.BaseLog;
 
 /**
  * Created by dongc_000 on 9/24/2015.
@@ -25,8 +24,7 @@ public class Lens extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         Color color = getColor();
-        batch.setColor(color.r, color.g, color.b, 0.8f);
-        BaseLog.checkColor(batch.getColor());
+        batch.setColor(color.r, color.g, color.b, 1f);
         batch.draw(lens, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(),
                 getScaleX(), getScaleY(), getRotation());
     }

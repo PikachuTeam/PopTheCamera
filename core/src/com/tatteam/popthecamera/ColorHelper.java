@@ -14,25 +14,46 @@ public class ColorHelper {
     private Color[] darkestColor;
     private int index;
     private int length;
+    public final static Color FAIL_COLOR = new Color(0xff2d2dff);
 
-    private ColorHelper() {
-    }
+    private ColorHelper() {}
 
     public void initColor() {
         brightestColor = new Color[]{
-                new Color(0, 131f / 255f, 143f / 255f, 1),
-                new Color(0x00E0F4FF),
-                new Color(0x907AFFFF)
+                new Color(0xe012bcff),
+                new Color(0x00ae63ff),
+                new Color(0x972805ff),
+                new Color(0x41419bff),
+                new Color(0x00838fff),
+                new Color(0xd14a89ff),
+                new Color(0x4a9cd1ff),
+                new Color(0x4ad190ff),
+                new Color(0xc76f49ff),
+                new Color(0xcc5053ff)
         };
         normalColor = new Color[]{
-                new Color(0, 96f / 255f, 100f / 255f, 1),
-                new Color(0x00C2C9FF),
-                new Color(0x7361CCFF)
+                new Color(0xc700a4ff),
+                new Color(0x008d50ff),
+                new Color(0x771d01ff),
+                new Color(0x21217dff),
+                new Color(0x006064ff),
+                new Color(0xc13074ff),
+                new Color(0x3381b3ff),
+                new Color(0x32b777ff),
+                new Color(0xb75a32ff),
+                new Color(0xb73235ff)
         };
         darkestColor = new Color[]{
-                new Color(0, 77f / 255f, 80f / 255f, 1),
-                new Color(0x00AFB5FF),
-                new Color(0x564999FF)
+                new Color(0x94057bff),
+                new Color(0x015732ff),
+                new Color(0x4a1403ff),
+                new Color(0x0b0b50ff),
+                new Color(0x004d50ff),
+                new Color(0x95124fff),
+                new Color(0x16547cff),
+                new Color(0x0f834bff),
+                new Color(0x8e3711ff),
+                new Color(0x8f1417ff)
         };
         length = brightestColor.length;
         index = 0;
@@ -62,6 +83,9 @@ public class ColorHelper {
     public Color getNormalColor(int index) {
         if (index >= length) {
             index -= length;
+        }
+        if (index < 0) {
+            index = length - 1;
         }
         return normalColor[index];
     }

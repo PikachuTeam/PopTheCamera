@@ -3,13 +3,14 @@ package com.tatteam.popthecamera;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.tatteam.popthecamera.actors.AlphaRectangle;
 import com.tatteam.popthecamera.actors.Background;
@@ -21,6 +22,7 @@ import com.tatteam.popthecamera.actors.TextView;
 
 public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener {
 
+    private OrthographicCamera camera;
     private Indicator indicator;
     private Dot dot;
     private Background background;
@@ -43,23 +45,28 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     private TextView level;
     private TextView index;
     private AlphaRectangle rectangle;
-    private Sound successSound;
-    private Sound failSound;
-    private Sound finishLevelSound;
     private double e;
     public static boolean touchable = true;
     private Color currentBackgroundColor;
+    private Button soundButton;
+    private Vector3 touchPoint;
+    private Preferences preferences;
 
     @Override
     public void create() {
-        BaseLog.enableLog = true;
+        Log.enableLog = true;
+        loadData();
+
+        camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
 
         rectangle = new AlphaRectangle();
         rectangle.setOnDisappearListener(this);
 
-        stage = new Stage(new FitViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT));
+        SoundHelper.getInstance().initSound();
 
-        flashStage=new Stage(new ExtendViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT));
+        stage = new Stage(new FitViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT, camera));
+
+        flashStage = new Stage(new ExtendViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT));
 //        flashStage = new Stage(new FillViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT));
 
         atlas = new TextureAtlas(Gdx.files.internal("images/large/pop_the_camera.pack"));
@@ -72,7 +79,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         dot.initPosition();
 
         stage.addActor(cameraGroup.getActors());
-        number = currentIndex = 1;
 
         if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
             indicator.clockwise = false;
@@ -80,11 +86,16 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
             indicator.clockwise = true;
         }
 
+        initButton();
+
+        touchPoint = new Vector3();
+
         Gdx.input.setInputProcessor(this);
     }
 
     @Override
     public void render() {
+        Gdx.gl.glClearColor(currentBackgroundColor.r, currentBackgroundColor.g, currentBackgroundColor.b, currentBackgroundColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         checkOver();
@@ -100,9 +111,12 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public void dispose() {
-        disposeSound();
+        saveData();
         stage.dispose();
         ColorHelper.getInstance().dispose();
+        SoundHelper.getInstance().dispose();
+        soundButton.dispose();
+        atlas.dispose();
         super.dispose();
     }
 
@@ -140,8 +154,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
         cameraGroup.setOnShakeCompleteListener(this);
 
-        initSound();
-
         initTextView();
     }
 
@@ -164,19 +176,15 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
         indicator = new Indicator(atlas.findRegion("indicator"));
         float offset1 = (lens2.getHeight() - lens3.getHeight()) / 2 - indicator.getHeight();
-        BaseLog.checkRotation("Indicator offset", offset1);
         indicator.setPosition(lens1.getWidth() / 2 - indicator.getWidth() / 2, (lens1.getHeight() - lens2.getHeight()) / 2 + lens2.getHeight() - indicator.getHeight() - offset1 / 2);
         indicator.setOrigin(indicator.getWidth() / 2f, -(lens3.getHeight() / 2f) - offset1 / 2f);
         dot = new Dot(atlas.findRegion("dot"));
         float offset2 = (lens2.getHeight() - lens3.getHeight()) / 2 - dot.getHeight();
-        BaseLog.checkRotation("Dot offset", offset2);
         dot.setPosition(lens1.getWidth() / 2 - dot.getWidth() / 2, (lens1.getHeight() - lens2.getHeight()) / 2 + lens2.getHeight() - dot.getHeight() - offset2 / 2);
         dot.setOrigin(dot.getWidth() / 2, -(lens3.getHeight() / 2) - offset2 / 2);
 
         // set color
-        lens3.setColor(new Color(0x00E50FFF));
-        lens4.setColor(new Color(0x00CC0AFF));
-        lens2.setColor(Color.valueOf("00E50F"));
+        ColorHelper.getInstance().setColor(lens2, lens3, lens4);
 
         lensGroup.addActor(lens1);
         lensGroup.addActor(lens2);
@@ -185,8 +193,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         lensGroup.addActor(dot);
         lensGroup.addActor(indicator);
 
-        double distance = Math.sqrt((indicator.getOriginX() - dot.getOriginX()) * (indicator.getOriginX() - dot.getOriginX()) + (indicator.getOriginY() - dot.getOriginY()) * (indicator.getOriginY() - dot.getOriginY()));
-        e = distance - (int) distance;
+        e = indicatorBeta / 7;
     }
 
     @Override
@@ -207,10 +214,15 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (touchable) {
-            if (playAgain) {
+            camera.unproject(touchPoint.set(screenX, screenY, 0));
+            if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
+                soundButton.setImage("press_sound");
+                Log.writeLog("Touch sound button");
+            } else if (playAgain) {
                 indicator.setRotation(0);
                 dot.initPosition();
                 playAgain = false;
+                currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex() - 1);
                 indicator.resetAngle();
                 if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
                     indicator.clockwise = false;
@@ -246,14 +258,14 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                     if (delta <= dotBeta / 2) {
                         currentIndex--;
                         index.setText("" + currentIndex);
-                        BaseLog.printString("Check over 1");
-                        BaseLog.checkRotation("Indicator Rotation", indicationRotation);
-                        BaseLog.checkRotation("Dot Rotation", dot.getRotation());
-                        BaseLog.checkRotation("Delta 2", delta);
-                        BaseLog.checkRotation("Dot beta", dotBeta / 2);
-                        BaseLog.checkRotation("Indicator beta", indicatorBeta / 8);
-                        BaseLog.printString("Ting ting.");
-                        successSound.play(0.5f);
+                        Log.writeLog("Check touch");
+                        Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                        Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                        Log.writeLog("Delta 2", "" + delta);
+                        Log.writeLog("Dot beta", "" + dotBeta / 2);
+                        Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                        Log.writeLog("Ting ting.");
+                        SoundHelper.getInstance().playSuccessSound();
                         if (currentIndex != 0) {
                             dot.randomPosition(indicator.clockwise);
                             if (indicator.clockwise) {
@@ -275,6 +287,17 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        camera.unproject(touchPoint.set(screenX, screenY, 0));
+        if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
+            if (SoundHelper.enableSound) {
+                soundButton.setImage("off_sound");
+                SoundHelper.enableSound = false;
+            } else {
+                SoundHelper.enableSound = true;
+                soundButton.setImage("on_sound");
+            }
+            Log.writeLog("Release sound button");
+        }
         return false;
     }
 
@@ -309,7 +332,9 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
             case 2:
                 playAgain = true;
                 cameraGroup.shake();
-                failSound.play(1f);
+                SoundHelper.getInstance().playFailSound();
+                touchable = false;
+                currentBackgroundColor = ColorHelper.FAIL_COLOR;
                 break;
         }
         currentIndex = number;
@@ -345,34 +370,26 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 if (isSameSide(indicationRotation, dot.getRotation())) {
                     if (indicationRotation < dot.getRotation()) {
                         if (delta > dotBeta / 2) {
-                            BaseLog.printString("Check over 1");
-                            BaseLog.checkRotation("Indicator Rotation", indicationRotation);
-                            BaseLog.checkRotation("Dot Rotation", dot.getRotation());
-                            BaseLog.checkRotation("Delta", delta);
-                            BaseLog.checkRotation("Dot beta", dotBeta);
-                            BaseLog.checkRotation("Indicator beta", indicatorBeta);
-                            BaseLog.checkRotation("Dot origin x:", dot.getOriginX());
-                            BaseLog.checkRotation("Dot origin y:", dot.getOriginY());
-                            BaseLog.checkRotation("Indicator origin x:", indicator.getOriginX());
-                            BaseLog.checkRotation("Indicator origin y:", indicator.getOriginY());
-                            BaseLog.printString("Tach.");
+                            Log.writeLog("Check over 1");
+                            Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                            Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                            Log.writeLog("Delta 2", "" + delta);
+                            Log.writeLog("Dot beta", "" + dotBeta / 2);
+                            Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                            Log.writeLog("Tach.");
                             stopGame(2);
                         }
                     }
                 } else {
                     if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
                         if (delta > dotBeta / 2) {
-                            BaseLog.printString("Check over 2");
-                            BaseLog.checkRotation("Indicator Rotation", indicationRotation);
-                            BaseLog.checkRotation("Dot Rotation", dot.getRotation());
-                            BaseLog.checkRotation("Delta", delta);
-                            BaseLog.checkRotation("Dot beta", dotBeta);
-                            BaseLog.checkRotation("Indicator beta", indicatorBeta);
-                            BaseLog.checkRotation("Dot origin x:", dot.getOriginX());
-                            BaseLog.checkRotation("Dot origin y:", dot.getOriginY());
-                            BaseLog.checkRotation("Indicator origin x:", indicator.getOriginX());
-                            BaseLog.checkRotation("Indicator origin y:", indicator.getOriginY());
-                            BaseLog.printString("Tach.");
+                            Log.writeLog("Check over 2");
+                            Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                            Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                            Log.writeLog("Delta 2", "" + delta);
+                            Log.writeLog("Dot beta", "" + dotBeta / 2);
+                            Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                            Log.writeLog("Tach.");
                             stopGame(2);
                         }
                     }
@@ -381,34 +398,26 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 if (isSameSide(indicationRotation, dot.getRotation())) {
                     if (indicationRotation > dot.getRotation()) {
                         if (delta > dotBeta / 2) {
-                            BaseLog.printString("Check over 3");
-                            BaseLog.checkRotation("Indicator Rotation", indicationRotation);
-                            BaseLog.checkRotation("Dot Rotation", dot.getRotation());
-                            BaseLog.checkRotation("Delta", delta);
-                            BaseLog.checkRotation("Dot beta", dotBeta);
-                            BaseLog.checkRotation("Indicator beta", indicatorBeta);
-                            BaseLog.checkRotation("Dot origin x:", dot.getOriginX());
-                            BaseLog.checkRotation("Dot origin y:", dot.getOriginY());
-                            BaseLog.checkRotation("Indicator origin x:", indicator.getOriginX());
-                            BaseLog.checkRotation("Indicator origin y:", indicator.getOriginY());
-                            BaseLog.printString("Tach.");
+                            Log.writeLog("Check over 3");
+                            Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                            Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                            Log.writeLog("Delta 2", "" + delta);
+                            Log.writeLog("Dot beta", "" + dotBeta / 2);
+                            Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                            Log.writeLog("Tach.");
                             stopGame(2);
                         }
                     }
                 } else {
                     if (dot.getRotation() >= 180 && dot.getRotation() <= 360) {
                         if (delta > dotBeta / 2) {
-                            BaseLog.printString("Check over 4");
-                            BaseLog.checkRotation("Indicator Rotation", indicationRotation);
-                            BaseLog.checkRotation("Dot Rotation", dot.getRotation());
-                            BaseLog.checkRotation("Delta", delta);
-                            BaseLog.checkRotation("Dot beta", dotBeta);
-                            BaseLog.checkRotation("Indicator beta", indicatorBeta);
-                            BaseLog.checkRotation("Dot origin x:", dot.getOriginX());
-                            BaseLog.checkRotation("Dot origin y:", dot.getOriginY());
-                            BaseLog.checkRotation("Indicator origin x:", indicator.getOriginX());
-                            BaseLog.checkRotation("Indicator origin y:", indicator.getOriginY());
-                            BaseLog.printString("Tach.");
+                            Log.writeLog("Check over 4");
+                            Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                            Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                            Log.writeLog("Delta 2", "" + delta);
+                            Log.writeLog("Dot beta", "" + dotBeta / 2);
+                            Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                            Log.writeLog("Tach.");
                             stopGame(2);
                         }
                     }
@@ -432,21 +441,9 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         return tmp;
     }
 
-    private void initSound() {
-        successSound = Gdx.audio.newSound(Gdx.files.internal("sounds/success.wav"));
-        failSound = Gdx.audio.newSound(Gdx.files.internal("sounds/fail.wav"));
-        finishLevelSound = Gdx.audio.newSound(Gdx.files.internal("sounds/finish_level.wav"));
-    }
-
-    private void disposeSound() {
-        successSound.dispose();
-        failSound.dispose();
-        finishLevelSound.dispose();
-    }
-
     @Override
     public void onPressFinish() {
-        finishLevelSound.play(0.2f);
+        SoundHelper.getInstance().playFinishLevelSound();
         rectangle.appear(flashStage);
     }
 
@@ -459,11 +456,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         level.setText("Level " + number);
         index.setText("" + currentIndex);
         playAgain = false;
-//        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex());
-////        ColorHelper.getInstance().setColor(lens2, lens3, lens4);
-//////        lens2.setColor(1f, 1f, 1f, 1);
-////        BaseLog.checkColor(lens3.getColor());
-////        BaseLog.checkColor(currentBackgroundColor);
+        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex());
+        ColorHelper.getInstance().setColor(lens2, lens3, lens4);
         if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
             indicator.clockwise = false;
         } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
@@ -472,18 +466,41 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     }
 
     private void initTextView() {
-        level = new TextView(Gdx.files.internal("fonts/bariol_regular.otf"));
-        index = new TextView(Gdx.files.internal("fonts/bariol_regular.otf"));
+        level = new TextView(Gdx.files.internal("fonts/aloha.fnt"), Gdx.files.internal("fonts/aloha_00.png"));
+        index = new TextView(Gdx.files.internal("fonts/aloha.fnt"), Gdx.files.internal("fonts/aloha_00.png"));
         level.setText("Level " + number);
         index.setText("" + currentIndex);
 
         stage.addActor(level);
         stage.addActor(index);
 
-        level.setFontSize(250);
-        index.setFontSize(400);
-
         level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 4 - level.getHeight() / 4);
-        index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth(), 3 * stage.getViewport().getWorldHeight() / 4 + 1.2f * index.getHeight());
+        index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 3, 3 * stage.getViewport().getWorldHeight() / 4 + 1.2f * index.getHeight());
+    }
+
+    private void initButton() {
+        if (SoundHelper.getInstance().enableSound) {
+            if (SoundHelper.enableSound) {
+                soundButton = new Button(atlas, "on_sound");
+            } else {
+                soundButton = new Button(atlas, "off_sound");
+            }
+            soundButton.setPosition(stage.getViewport().getWorldWidth() - 3 * soundButton.getWidth() / 2f, stage.getViewport().getWorldHeight() - 3 * soundButton.getHeight() / 2f);
+            soundButton.addTo(stage);
+        }
+    }
+
+    private void loadData() {
+        preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
+        number = preferences.getInteger("number", 1);
+        currentIndex = number;
+        SoundHelper.enableSound = preferences.getBoolean("sound", true);
+    }
+
+    private void saveData() {
+        preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
+        preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
+        preferences.putInteger("number", number);
+        preferences.putBoolean("sound", SoundHelper.enableSound);
     }
 }
