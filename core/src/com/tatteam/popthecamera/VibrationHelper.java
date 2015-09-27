@@ -12,7 +12,7 @@ public class VibrationHelper {
     // duration in second
     public static void vibrate(float duration) {
         if (enableVibration) {
-            int tmp = (int) (duration * 1000);
+            int tmp = (int) (duration * 30);
             Gdx.input.vibrate(tmp);
         }
     }
