@@ -28,6 +28,13 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/layout_flash_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:visibility="gone"></RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/layout_flash"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

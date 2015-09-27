@@ -1,11 +1,15 @@
 package com.tatteam.popthecamera.android;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.Toast;
 
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -21,7 +25,7 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
     private static final long SPLASH_DURATION = 2000;
     private static final boolean ADS_ENABLE = false;
 
-    private View layout_flash;
+    private View layout_flash,layout_flash_background;
     private boolean isBackKeyAvailable = false;
     private long backPressed;
     private AppRate appRate;
@@ -62,19 +66,64 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
 
     private void displaySplashScreen() {
         layout_flash = findViewById(R.id.layout_flash);
+        layout_flash_background = findViewById(R.id.layout_flash_background);
         layout_flash.setVisibility(View.VISIBLE);
+        layout_flash_background.setVisibility(View.VISIBLE);
+        layout_flash.setAlpha(0);
         layout_flash.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
             }
         });
-        layout_flash.postDelayed(new Runnable() {
+        ObjectAnimator set1 =ObjectAnimator.ofFloat(layout_flash, "alpha", 0.0f, 1f).setDuration(750);
+        ObjectAnimator set2 =ObjectAnimator.ofFloat(layout_flash, "alpha", 1f, 1f).setDuration(700);
+        set2.addListener(new Animator.AnimatorListener() {
             @Override
-            public void run() {
+            public void onAnimationStart(Animator animator) {
+                layout_flash_background.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+        ObjectAnimator set3 =ObjectAnimator.ofFloat(layout_flash, "alpha", 1f, 0f).setDuration(750);
+        set3.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
                 layout_flash.setVisibility(View.GONE);
                 isBackKeyAvailable = true;
             }
-        }, SPLASH_DURATION);
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+        AnimatorSet set = new AnimatorSet();
+        set.playSequentially(set1,set2,set3);
+        set.start();
     }
 
     private void addGameFragment() {
