@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.actions.ScaleToAction;
+import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.tatteam.popthecamera.Main;
 
 import java.util.Random;
 
@@ -15,6 +17,7 @@ public class Dot extends Actor {
 
     private TextureRegion dot;
     private Random random;
+    private OnFadeCompleteListener listener;
 
     public Dot(TextureRegion dot) {
         this.dot = new TextureRegion(dot);
@@ -22,8 +25,8 @@ public class Dot extends Actor {
         random = new Random();
     }
 
-    public void setCenterOrigin(float radius) {
-        setOrigin(getWidth() / 2, -(radius + 10f));
+    public void setOnFadeCompleteListener(OnFadeCompleteListener listener) {
+        this.listener = listener;
     }
 
     public void initPosition() {
@@ -51,20 +54,54 @@ public class Dot extends Actor {
         setRotation(rotation);
     }
 
-    public void scaleTo(float x, float y, float aspectRatio) {
-        ScaleToAction action = new ScaleToAction();
-//        action.setScale(0.5f);
-        action.setX(x);
-        action.setY(y);
-        action.setDuration(1f);
-        addAction(action);
+    public void fadeOut(final int type) {
+        AlphaAction alphaAction = new AlphaAction() {
+            @Override
+            public boolean act(float delta) {
+                boolean complete = super.act(delta);
+                if (complete) {
+                    if (listener != null) {
+                        listener.onFadeOutComplete(type);
+                    }
+                }
+                return complete;
+            }
+        };
+        alphaAction.setAlpha(0f);
+        alphaAction.setDuration(0.1f);
+        addAction(alphaAction);
+    }
+
+    public void fadeIn(final int type) {
+        final AlphaAction alphaAction = new AlphaAction() {
+            @Override
+            public boolean act(float delta) {
+                boolean complete = super.act(delta);
+                if (complete) {
+                    if (listener != null) {
+                        listener.onFadeInComplete(type);
+                    }
+                }
+                return complete;
+            }
+        };
+        alphaAction.setAlpha(1);
+        alphaAction.setDuration(0.15f);
+        addAction(alphaAction);
     }
 
     @Override
+
     public void draw(Batch batch, float parentAlpha) {
         Color color = getColor();
         batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
         batch.draw(dot, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(),
                 getScaleX(), getScaleY(), getRotation());
+    }
+
+    public interface OnFadeCompleteListener {
+        void onFadeOutComplete(int type);
+
+        void onFadeInComplete(int type);
     }
 }

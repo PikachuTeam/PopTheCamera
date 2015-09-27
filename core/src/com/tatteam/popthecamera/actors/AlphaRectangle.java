@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
+import com.tatteam.popthecamera.ColorHelper;
 import com.tatteam.popthecamera.Main;
 
 /**
@@ -16,6 +17,7 @@ public class AlphaRectangle extends Actor {
 
     private ShapeRenderer rectangle;
     private OnDisappearListener listener;
+    private AlphaAction alphaAction;
     private float width;
     private float height;
 
@@ -23,6 +25,19 @@ public class AlphaRectangle extends Actor {
         rectangle = new ShapeRenderer();
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
+
+        alphaAction = new AlphaAction() {
+            public boolean act(float delta) {
+                boolean complete = super.act(delta);
+                if (complete) {
+                    if (listener != null) {
+                        alphaAction.reset();
+                        listener.onDisappear(AlphaRectangle.this);
+                    }
+                }
+                return complete;
+            }
+        };
     }
 
     public void setOnDisappearListener(OnDisappearListener listener) {
@@ -31,24 +46,12 @@ public class AlphaRectangle extends Actor {
 
     public void appear(Stage stage) {
         stage.addActor(this);
-        width = stage.getViewport().getWorldWidth();
-        height = stage.getViewport().getWorldHeight();
+        width = stage.getWidth();
+        height = stage.getHeight();
         Main.touchable = false;
-        AlphaAction alphaAction1 = new AlphaAction() {
-            public boolean act(float delta) {
-                boolean complete = super.act(delta);
-                if (complete) {
-                    if (listener != null) {
-                        listener.onDisappear(AlphaRectangle.this);
-                    }
-                }
-                return complete;
-            }
-        };
-        alphaAction1.setAlpha(1f);
-        alphaAction1.setDuration(0.3f);
-
-        addAction(alphaAction1);
+        alphaAction.setAlpha(1f);
+        alphaAction.setDuration(0.3f);
+        addAction(alphaAction);
     }
 
     @Override
@@ -57,7 +60,7 @@ public class AlphaRectangle extends Actor {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         rectangle.begin(ShapeRenderer.ShapeType.Filled);
-        rectangle.setColor(0f, 67f / 255f, 55 / 255f, 0.9f);
+        rectangle.setColor(ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex()));
         rectangle.rect(0, 0, width, height);
         rectangle.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);

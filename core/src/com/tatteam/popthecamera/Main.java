@@ -20,7 +20,7 @@ import com.tatteam.popthecamera.actors.Indicator;
 import com.tatteam.popthecamera.actors.Lens;
 import com.tatteam.popthecamera.actors.TextView;
 
-public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener {
+public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener, Dot.OnFadeCompleteListener {
 
     private OrthographicCamera camera;
     private Indicator indicator;
@@ -46,12 +46,13 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     private TextView index;
     private AlphaRectangle rectangle;
     private double e;
-    public static boolean touchable = true;
     private Color currentBackgroundColor;
     private Button soundButton;
     private Button vibrationButton;
     private Vector3 touchPoint;
     private Preferences preferences;
+
+    public static boolean touchable = true;
 
     @Override
     public void create() {
@@ -183,6 +184,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         float offset2 = (lens2.getHeight() - lens3.getHeight()) / 2 - dot.getHeight();
         dot.setPosition(lens1.getWidth() / 2 - dot.getWidth() / 2, (lens1.getHeight() - lens2.getHeight()) / 2 + lens2.getHeight() - dot.getHeight() - offset2 / 2);
         dot.setOrigin(dot.getWidth() / 2, -(lens3.getHeight() / 2) - offset2 / 2);
+        dot.setOnFadeCompleteListener(this);
 
         // set color
         ColorHelper.getInstance().setColor(lens2, lens3, lens4);
@@ -221,16 +223,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
             } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
                 vibrationButton.setImage("press_vibrate");
             } else if (playAgain) {
-                indicator.setRotation(0);
-                dot.initPosition();
-                playAgain = false;
-                currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex() - 1);
-                indicator.resetAngle();
-                if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
-                    indicator.clockwise = false;
-                } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
-                    indicator.clockwise = true;
-                }
+                dot.fadeOut(1);
+                indicator.isMoving = false;
             } else {
                 if (!indicator.isMoving) {
                     indicator.isMoving = true;
@@ -269,12 +263,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                         Log.writeLog("Ting ting.");
                         SoundHelper.getInstance().playSuccessSound();
                         if (currentIndex != 0) {
-                            dot.randomPosition(indicator.clockwise);
-                            if (indicator.clockwise) {
-                                indicator.clockwise = false;
-                            } else {
-                                indicator.clockwise = true;
-                            }
+                            dot.fadeOut(2);
+                            indicator.isMoving = false;
                         } else {
                             stopGame(1);
                         }
@@ -345,7 +335,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 SoundHelper.getInstance().playFailSound();
                 touchable = false;
                 VibrationHelper.vibrate(1);
-//                dot.scaleTo(dot.getX(), dot.getY(), 0.5f);
                 currentBackgroundColor = ColorHelper.FAIL_COLOR;
                 break;
         }
@@ -354,88 +343,89 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     }
 
     private void checkOver() {
-        if (indicator.isMoving) {
-            double indicationRotation = recalculateAngleIfNeed(indicator.getRotation());
-            double delta;
+            if (indicator.isMoving) {
+                double indicationRotation = recalculateAngleIfNeed(indicator.getRotation());
+                double delta;
 
-            if (indicator.clockwise) {
-                if (indicationRotation == 0) {
-                    indicationRotation = 360;
+                if (indicator.clockwise) {
+                    if (indicationRotation == 0) {
+                        indicationRotation = 360;
+                    }
+                }
+
+                if (isSameSide(indicationRotation, dot.getRotation())) {
+                    if (indicationRotation >= dot.getRotation()) {
+                        delta = indicationRotation - dot.getRotation();
+                    } else {
+                        delta = -indicationRotation + dot.getRotation();
+                    }
+                } else {
+                    if (indicationRotation >= dot.getRotation()) {
+                        delta = 360 - indicationRotation + dot.getRotation();
+                    } else {
+                        delta = 360 - dot.getRotation() + indicationRotation;
+                    }
+                }
+                delta -= e;
+                if (indicator.clockwise) {
+                    if (isSameSide(indicationRotation, dot.getRotation())) {
+                        if (indicationRotation < dot.getRotation()) {
+                            if (delta > dotBeta / 2) {
+                                Log.writeLog("Check over 1");
+                                Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                Log.writeLog("Delta 2", "" + delta);
+                                Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                Log.writeLog("Tach.");
+                                stopGame(2);
+                            }
+                        }
+                    } else {
+                        if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
+                            if (delta > dotBeta / 2) {
+                                Log.writeLog("Check over 2");
+                                Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                Log.writeLog("Delta 2", "" + delta);
+                                Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                Log.writeLog("Tach.");
+                                stopGame(2);
+                            }
+                        }
+                    }
+                } else {
+                    if (isSameSide(indicationRotation, dot.getRotation())) {
+                        if (indicationRotation > dot.getRotation()) {
+                            if (delta > dotBeta / 2) {
+                                Log.writeLog("Check over 3");
+                                Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                Log.writeLog("Delta 2", "" + delta);
+                                Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                Log.writeLog("Tach.");
+                                stopGame(2);
+                            }
+                        }
+                    } else {
+                        if (dot.getRotation() >= 180 && dot.getRotation() <= 360) {
+                            if (delta > dotBeta / 2) {
+                                Log.writeLog("Check over 4");
+                                Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                Log.writeLog("Delta 2", "" + delta);
+                                Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                Log.writeLog("Tach.");
+                                stopGame(2);
+                            }
+                        }
+                    }
                 }
             }
 
-            if (isSameSide(indicationRotation, dot.getRotation())) {
-                if (indicationRotation >= dot.getRotation()) {
-                    delta = indicationRotation - dot.getRotation();
-                } else {
-                    delta = -indicationRotation + dot.getRotation();
-                }
-            } else {
-                if (indicationRotation >= dot.getRotation()) {
-                    delta = 360 - indicationRotation + dot.getRotation();
-                } else {
-                    delta = 360 - dot.getRotation() + indicationRotation;
-                }
-            }
-            delta -= e;
-            if (indicator.clockwise) {
-                if (isSameSide(indicationRotation, dot.getRotation())) {
-                    if (indicationRotation < dot.getRotation()) {
-                        if (delta > dotBeta / 2) {
-                            Log.writeLog("Check over 1");
-                            Log.writeLog("Indicator Rotation", "" + indicationRotation);
-                            Log.writeLog("Dot Rotation", "" + dot.getRotation());
-                            Log.writeLog("Delta 2", "" + delta);
-                            Log.writeLog("Dot beta", "" + dotBeta / 2);
-                            Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
-                            Log.writeLog("Tach.");
-                            stopGame(2);
-                        }
-                    }
-                } else {
-                    if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
-                        if (delta > dotBeta / 2) {
-                            Log.writeLog("Check over 2");
-                            Log.writeLog("Indicator Rotation", "" + indicationRotation);
-                            Log.writeLog("Dot Rotation", "" + dot.getRotation());
-                            Log.writeLog("Delta 2", "" + delta);
-                            Log.writeLog("Dot beta", "" + dotBeta / 2);
-                            Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
-                            Log.writeLog("Tach.");
-                            stopGame(2);
-                        }
-                    }
-                }
-            } else {
-                if (isSameSide(indicationRotation, dot.getRotation())) {
-                    if (indicationRotation > dot.getRotation()) {
-                        if (delta > dotBeta / 2) {
-                            Log.writeLog("Check over 3");
-                            Log.writeLog("Indicator Rotation", "" + indicationRotation);
-                            Log.writeLog("Dot Rotation", "" + dot.getRotation());
-                            Log.writeLog("Delta 2", "" + delta);
-                            Log.writeLog("Dot beta", "" + dotBeta / 2);
-                            Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
-                            Log.writeLog("Tach.");
-                            stopGame(2);
-                        }
-                    }
-                } else {
-                    if (dot.getRotation() >= 180 && dot.getRotation() <= 360) {
-                        if (delta > dotBeta / 2) {
-                            Log.writeLog("Check over 4");
-                            Log.writeLog("Indicator Rotation", "" + indicationRotation);
-                            Log.writeLog("Dot Rotation", "" + dot.getRotation());
-                            Log.writeLog("Delta 2", "" + delta);
-                            Log.writeLog("Dot beta", "" + dotBeta / 2);
-                            Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
-                            Log.writeLog("Tach.");
-                            stopGame(2);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private boolean isSameSide(double angle1, double angle2) {
@@ -509,10 +499,12 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     private void loadData() {
         preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
-        number = preferences.getInteger("number", 1);
+//        number = preferences.getInteger("number", 1);
+        number = 1;
         currentIndex = number;
         SoundHelper.enableSound = preferences.getBoolean("sound", true);
         VibrationHelper.enableVibration = preferences.getBoolean("vibration", true);
+
     }
 
     private void saveData() {
@@ -522,5 +514,43 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         preferences.putBoolean("sound", SoundHelper.enableSound);
         preferences.putBoolean("vibration", VibrationHelper.enableVibration);
         preferences.flush();
+    }
+
+    @Override
+    public void onFadeOutComplete(int type) {
+        switch (type) {
+            case 1:
+                dot.initPosition();
+                break;
+            case 2:
+                dot.randomPosition(indicator.clockwise);
+                if (indicator.clockwise) {
+                    indicator.clockwise = false;
+                } else {
+                    indicator.clockwise = true;
+                }
+                break;
+        }
+        dot.fadeIn(type);
+    }
+
+    @Override
+    public void onFadeInComplete(int type) {
+        switch (type) {
+            case 1:
+                indicator.setRotation(0);
+                playAgain = false;
+                currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex() - 1);
+                indicator.resetAngle();
+                if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
+                    indicator.clockwise = false;
+                } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
+                    indicator.clockwise = true;
+                }
+                break;
+            case 2:
+                break;
+        }
+        indicator.isMoving = true;
     }
 }
