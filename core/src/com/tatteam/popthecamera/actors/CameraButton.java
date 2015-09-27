@@ -24,11 +24,6 @@ public class CameraButton extends Actor {
         this.listener = listener;
     }
 
-    public CameraButton(TextureRegion cameraButton, float width, float height, float x, float y) {
-        this.cameraButton = new TextureRegion(cameraButton);
-        setBounds(x, y, width, height);
-    }
-
     public void press() {
         float defaultX = getX();
         float defaultY = getY();
