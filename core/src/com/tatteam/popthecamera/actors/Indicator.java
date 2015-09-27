@@ -19,8 +19,7 @@ public class Indicator extends Actor {
     private float accelerator;
 
     public Indicator(TextureRegion indicator) {
-//        this.indicator = new Te(Gdx.files.internal("images/large/indicator.png"));
-        this.indicator = new TextureRegion(new Texture(Gdx.files.internal("images/large/indicator.png")));
+        this.indicator = new TextureRegion(indicator);
         setBounds(getX(), getY(), this.indicator.getRegionWidth(), this.indicator.getRegionHeight());
         accelerator = 1;
     }
