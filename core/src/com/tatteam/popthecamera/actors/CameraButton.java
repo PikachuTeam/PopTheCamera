@@ -24,11 +24,6 @@ public class CameraButton extends Actor {
         this.listener = listener;
     }
 
-    public CameraButton(TextureRegion cameraButton, float width, float height, float x, float y) {
-        this.cameraButton = new TextureRegion(cameraButton);
-        setBounds(x, y, width, height);
-    }
-
     public void press() {
         float defaultX = getX();
         float defaultY = getY();
@@ -58,7 +53,7 @@ public class CameraButton extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         Color color = getColor();
-        batch.setColor(color.r, color.g, color.b, color.a);
+        batch.setColor(color.r, color.g, color.b, color.a*parentAlpha);
         batch.draw(cameraButton, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(),
                 getScaleX(), getScaleY(), getRotation());
     }

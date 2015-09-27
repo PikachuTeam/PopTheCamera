@@ -89,15 +89,15 @@ camera_button
   index: -1
 dot
   rotate: false
-  xy: 900, 1059
-  size: 73, 73
-  orig: 73, 73
+  xy: 900, 1061
+  size: 71, 71
+  orig: 71, 71
   offset: 0, 0
   index: -1
 indicator
   rotate: false
-  xy: 1979, 1939
-  size: 34, 100
-  orig: 34, 100
+  xy: 1979, 1951
+  size: 25, 88
+  orig: 25, 88
   offset: 0, 0
   index: -1

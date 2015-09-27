@@ -14,12 +14,7 @@ public class Lens extends Actor {
 
     public Lens(TextureRegion lens) {
         this.lens = new TextureRegion(lens);
-        setBounds(getX(), getY(), lens.getRegionWidth(), lens.getRegionHeight());
-    }
-
-    public Lens(TextureRegion lens, float width, float height, float x, float y) {
-        this.lens = new TextureRegion(lens);
-        setBounds(x, y, width, height);
+        setBounds(getX(), getY(), this.lens.getRegionWidth(), this.lens.getRegionHeight());
     }
 
     public void setCenterPosition(float parentWidth, float parentHeight) {
@@ -29,7 +24,7 @@ public class Lens extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         Color color = getColor();
-        batch.setColor(color.r, color.g, color.b, color.a);
+        batch.setColor(color.r, color.g, color.b, 1f);
         batch.draw(lens, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(),
                 getScaleX(), getScaleY(), getRotation());
     }
