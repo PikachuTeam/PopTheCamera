@@ -7,7 +7,7 @@ import com.badlogic.gdx.Gdx;
  */
 public class AssetsLoader {
     private static AssetsLoader instance;
-    private ScreenResolution[] screenResolutions = new ScreenResolution[]{ScreenResolution.MEDIUM, ScreenResolution.HIGH};
+    private ScreenResolution[] screenResolutions = new ScreenResolution[]{ScreenResolution.LOW, ScreenResolution.MEDIUM, ScreenResolution.HIGH};
     private ScreenResolution activeScreenResolution;
 
     private AssetsLoader() {
@@ -25,7 +25,7 @@ public class AssetsLoader {
         int screenWidth = Gdx.graphics.getWidth();
         for (int i = screenResolutions.length - 1; i >= 0; i--) {
             ScreenResolution screenResolution = screenResolutions[i];
-            if (screenWidth >= screenResolution.smallWidth) {
+            if (screenWidth >= screenResolution.getViewPortSize().getWidth()) {
                 activeScreenResolution = screenResolution;
                 break;
             }
@@ -44,16 +44,20 @@ public class AssetsLoader {
         return activeScreenResolution.getFontPath();
     }
 
-    public static enum ScreenResolution {
-        HIGH(1152, "images/high/", "fonts/high/"),
-        MEDIUM(768, "images/medium/", "fonts/medium/"),
-        LOW(512, "images/low/", "fonts/low/");
+    public ViewPortSize getViewPortSize() {
+        return activeScreenResolution.getViewPortSize();
+    }
 
-        private int smallWidth;
+    public static enum ScreenResolution {
+        LOW(ViewPortSize.LOW, "images/low/", "fonts/low/"),
+        MEDIUM(ViewPortSize.MEDIUM, "images/medium/", "fonts/medium/"),
+        HIGH(ViewPortSize.HIGH, "images/high/", "fonts/high/");
+
+        private ViewPortSize viewPortSize;
         private String imagePath, fontPath;
-        
-        private ScreenResolution(int smallWidth, String imagePath, String fontPath) {
-            this.smallWidth = smallWidth;
+
+        private ScreenResolution(ViewPortSize viewPortSize, String imagePath, String fontPath) {
+            this.viewPortSize = viewPortSize;
             this.imagePath = imagePath;
             this.fontPath = fontPath;
         }
@@ -66,9 +70,31 @@ public class AssetsLoader {
             return fontPath;
         }
 
-        public int getSmallWidth() {
-            return smallWidth;
+        public ViewPortSize getViewPortSize() {
+            return viewPortSize;
         }
     }
+
+    public static enum ViewPortSize {
+        LOW(512, 853),
+        MEDIUM(768, 1280),
+        HIGH(1152, 1920);
+
+        private int width, height;
+
+        private ViewPortSize(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+
+        public int getWidth() {
+            return width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+    }
+
 
 }
