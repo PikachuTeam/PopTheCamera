@@ -21,18 +21,18 @@ public class ColorHelper {
     public void initColor() {
         brightestColor = new Color[]{
                 new Color(0, 131f / 255f, 143f / 255f, 1),
-                new Color(0x00838F),
-                new Color(0x907AFF)
+                new Color(0x00E0F4FF),
+                new Color(0x907AFFFF)
         };
         normalColor = new Color[]{
                 new Color(0, 96f / 255f, 100f / 255f, 1),
-                new Color(0x006064),
-                new Color(0x7361CC)
+                new Color(0x00C2C9FF),
+                new Color(0x7361CCFF)
         };
         darkestColor = new Color[]{
                 new Color(0, 77f / 255f, 80f / 255f, 1),
-                new Color(0x004D50),
-                new Color(0x564999)
+                new Color(0x00AFB5FF),
+                new Color(0x564999FF)
         };
         length = brightestColor.length;
         index = 0;

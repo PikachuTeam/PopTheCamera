@@ -16,9 +16,13 @@ public class AlphaRectangle extends Actor {
 
     private ShapeRenderer rectangle;
     private OnDisappearListener listener;
+    private float width;
+    private float height;
 
     public AlphaRectangle() {
         rectangle = new ShapeRenderer();
+        width = Gdx.graphics.getWidth();
+        height = Gdx.graphics.getHeight();
     }
 
     public void setOnDisappearListener(OnDisappearListener listener) {
@@ -27,6 +31,8 @@ public class AlphaRectangle extends Actor {
 
     public void appear(Stage stage) {
         stage.addActor(this);
+        width = stage.getViewport().getWorldWidth();
+        height = stage.getViewport().getWorldHeight();
         Main.touchable = false;
         AlphaAction alphaAction1 = new AlphaAction() {
             public boolean act(float delta) {
@@ -52,7 +58,7 @@ public class AlphaRectangle extends Actor {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         rectangle.begin(ShapeRenderer.ShapeType.Filled);
         rectangle.setColor(0f, 67f / 255f, 55 / 255f, 0.9f);
-        rectangle.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        rectangle.rect(0, 0, width, height);
         rectangle.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
         batch.begin();

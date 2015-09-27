@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.tatteam.popthecamera.actors.AlphaRectangle;
 import com.tatteam.popthecamera.actors.Background;
@@ -23,6 +25,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     private Dot dot;
     private Background background;
     private Stage stage;
+    private Stage flashStage;
     private TextureAtlas atlas;
     private ActorGroup cameraGroup;
     private ActorGroup lensGroup;
@@ -55,7 +58,9 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         rectangle.setOnDisappearListener(this);
 
         stage = new Stage(new FitViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT));
-        stage.getViewport().apply();
+
+        flashStage=new Stage(new ExtendViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT));
+//        flashStage = new Stage(new FillViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT));
 
         atlas = new TextureAtlas(Gdx.files.internal("images/large/pop_the_camera.pack"));
 
@@ -69,20 +74,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         stage.addActor(cameraGroup.getActors());
         number = currentIndex = 1;
 
-        level = new TextView(Gdx.files.internal("fonts/bariol_regular.otf"));
-        index = new TextView(Gdx.files.internal("fonts/bariol_regular.otf"));
-        level.setText("Level " + number);
-        index.setText("" + currentIndex);
-
-        stage.addActor(level);
-        stage.addActor(index);
-
-        level.setFontSize(250);
-        index.setFontSize(400);
-
-        level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 4 - level.getHeight() / 4);
-        index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth(), 3 * stage.getViewport().getWorldHeight() / 4 + 1.2f * index.getHeight());
-
         if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
             indicator.clockwise = false;
         } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
@@ -94,15 +85,17 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public void render() {
-//        Gdx.gl.glClearColor(18 / 255f, 204 / 255f, 126 / 255f, 1);
-        Gdx.gl.glClearColor(currentBackgroundColor.r, currentBackgroundColor.g, currentBackgroundColor.b, currentBackgroundColor.a);
-//        Gdx.gl.glClearColor(ColorHelper.getInstance().testColor.getRed()/255f, ColorHelper.getInstance().testColor.getGreen()/255f, ColorHelper.getInstance().testColor.getBlue()/255f, ColorHelper.getInstance().testColor.getAlpha()/255f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         checkOver();
 
+        stage.getViewport().apply();
         stage.act();
         stage.draw();
+
+        flashStage.getViewport().apply();
+        flashStage.act();
+        flashStage.draw();
     }
 
     @Override
@@ -148,6 +141,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         cameraGroup.setOnShakeCompleteListener(this);
 
         initSound();
+
+        initTextView();
     }
 
     // Set up lens group
@@ -179,7 +174,9 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         dot.setOrigin(dot.getWidth() / 2, -(lens3.getHeight() / 2) - offset2 / 2);
 
         // set color
-        ColorHelper.getInstance().setColor(lens2, lens3, lens4);
+        lens3.setColor(new Color(0x00E50FFF));
+        lens4.setColor(new Color(0x00CC0AFF));
+        lens2.setColor(Color.valueOf("00E50F"));
 
         lensGroup.addActor(lens1);
         lensGroup.addActor(lens2);
@@ -214,7 +211,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 indicator.setRotation(0);
                 dot.initPosition();
                 playAgain = false;
-                index.setText("" + currentIndex);
                 indicator.resetAngle();
                 if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
                     indicator.clockwise = false;
@@ -300,6 +296,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public void onShakeComplete() {
         touchable = true;
+        index.setText("" + currentIndex);
     }
 
     // situation: 1-win; 2-lose
@@ -450,7 +447,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public void onPressFinish() {
         finishLevelSound.play(0.2f);
-        rectangle.appear(stage);
+        rectangle.appear(flashStage);
     }
 
     @Override
@@ -462,15 +459,31 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         level.setText("Level " + number);
         index.setText("" + currentIndex);
         playAgain = false;
-        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex());
-        ColorHelper.getInstance().setColor(lens2, lens3, lens4);
-//        lens2.setColor(1f, 1f, 1f, 1);
-        BaseLog.checkColor(lens3.getColor());
-        BaseLog.checkColor(currentBackgroundColor);
+//        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex());
+////        ColorHelper.getInstance().setColor(lens2, lens3, lens4);
+//////        lens2.setColor(1f, 1f, 1f, 1);
+////        BaseLog.checkColor(lens3.getColor());
+////        BaseLog.checkColor(currentBackgroundColor);
         if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
             indicator.clockwise = false;
         } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
             indicator.clockwise = true;
         }
+    }
+
+    private void initTextView() {
+        level = new TextView(Gdx.files.internal("fonts/bariol_regular.otf"));
+        index = new TextView(Gdx.files.internal("fonts/bariol_regular.otf"));
+        level.setText("Level " + number);
+        index.setText("" + currentIndex);
+
+        stage.addActor(level);
+        stage.addActor(index);
+
+        level.setFontSize(250);
+        index.setFontSize(400);
+
+        level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 4 - level.getHeight() / 4);
+        index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth(), 3 * stage.getViewport().getWorldHeight() / 4 + 1.2f * index.getHeight());
     }
 }

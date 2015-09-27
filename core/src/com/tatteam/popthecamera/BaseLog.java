@@ -54,7 +54,7 @@ public class BaseLog {
 
     public static void checkColor(Color color) {
         if (enableLog) {
-            Gdx.app.log(Constants.APP_TITLE, "Check color: " + color.r + " " + color.g + " " + color.b);
+            Gdx.app.log(Constants.APP_TITLE, "Check color: " + color.r + " " + color.g + " " + color.b + " " + color.a);
         }
     }
 }
