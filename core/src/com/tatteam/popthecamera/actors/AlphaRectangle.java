@@ -1,8 +1,11 @@
 package com.tatteam.popthecamera.actors;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -23,9 +26,6 @@ public class AlphaRectangle extends Actor {
 
     public AlphaRectangle() {
         rectangle = new ShapeRenderer();
-        width = Gdx.graphics.getWidth();
-        height = Gdx.graphics.getHeight();
-
         alphaAction = new AlphaAction() {
             public boolean act(float delta) {
                 boolean complete = super.act(delta);
@@ -46,11 +46,11 @@ public class AlphaRectangle extends Actor {
 
     public void appear(Stage stage) {
         stage.addActor(this);
-        width = stage.getWidth();
-        height = stage.getHeight();
         Main.touchable = false;
+        width = stage.getViewport().getWorldWidth();
+        height = stage.getViewport().getWorldHeight();
         alphaAction.setAlpha(1f);
-        alphaAction.setDuration(0.3f);
+        alphaAction.setDuration(0.2f);
         addAction(alphaAction);
     }
 
