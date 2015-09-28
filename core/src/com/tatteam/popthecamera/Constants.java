@@ -7,14 +7,16 @@ public class Constants {
 
     public final static String APP_TITLE = "Pop The Camera";
 
-    public final static int SCREEN_WIDTH = 768 / 2;
-    public final static int SCREEN_HEIGHT = 1280 / 2;
-
-    public final static float VIEWPORT_WIDTH = 768 *1.5f;
-    public final static float VIEWPORT_HEIGHT = 1280*1.5f;
+    public final static int DESKTOP_SCREEN_WIDTH = 512;
+    public final static int DESKTOP_SCREEN_HEIGHT = 853;
 
     public final static float BACKGROUND_ROTATION = 2f;
 
     public final static float ROTATION_DURATION = 0.1f;
+
+    public final static float CAMERA_BUTTON_PRESS_DURATION = 0.4f;
+    public final static float CAMERA_BUTTON_RELEASE_DURATION = 0.25f;
+
+    public final static float DOT_ROTATION_ACCELERATOR = 1.85f;
 
 }

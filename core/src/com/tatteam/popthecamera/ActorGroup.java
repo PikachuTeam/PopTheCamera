@@ -12,10 +12,55 @@ public class ActorGroup {
 
     private Group actors;
     private OnShakeCompleteListener listener;
+    private RotateToAction action1;
+    private RotateToAction action2;
+    private RotateToAction action3;
 
     public ActorGroup() {
         actors = new Group();
+        action1 = new RotateToAction() {
+            @Override
+            public boolean act(float delta) {
+                boolean complete = super.act(delta);
+                if (complete) {
+                    action1.reset();
+                }
+                return complete;
+            }
+        };
+        action2 = new RotateToAction() {
+            @Override
+            public boolean act(float delta) {
+                boolean complete = super.act(delta);
+                if (complete) {
+                    action2.reset();
+                }
+                return complete;
+            }
+        };
+        action3 = new RotateToAction() {
+            @Override
+            public boolean act(float delta) {
+                boolean complete = super.act(delta);
+                if (complete) {
+                    action3.reset();
+                    if (listener != null) {
+                        listener.onShakeComplete();
+                    }
+                }
+                return complete;
+            }
+        };
     }
+
+    public float getY() {
+        return actors.getY();
+    }
+
+    public float getX() {
+        return actors.getX();
+    }
+
 
     public Group getActors() {
         return actors;
@@ -50,26 +95,12 @@ public class ActorGroup {
     }
 
     public void shake() {
-        RotateToAction action1 = new RotateToAction();
         action1.setRotation(Constants.BACKGROUND_ROTATION);
         action1.setDuration(Constants.ROTATION_DURATION);
 
-        RotateToAction action2 = new RotateToAction();
         action2.setRotation(-Constants.BACKGROUND_ROTATION);
         action2.setDuration(Constants.ROTATION_DURATION * 2);
 
-        RotateToAction action3 = new RotateToAction() {
-            @Override
-            public boolean act(float delta) {
-                boolean complete = super.act(delta);
-                if (complete) {
-                    if (listener != null) {
-                        listener.onShakeComplete();
-                    }
-                }
-                return complete;
-            }
-        };
         action3.setRotation(0);
         action3.setDuration(Constants.ROTATION_DURATION);
 

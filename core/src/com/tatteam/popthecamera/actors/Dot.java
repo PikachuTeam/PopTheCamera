@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
-import com.tatteam.popthecamera.Main;
 
 import java.util.Random;
 
@@ -18,11 +16,40 @@ public class Dot extends Actor {
     private TextureRegion dot;
     private Random random;
     private OnFadeCompleteListener listener;
+    private AlphaAction fadeIn;
+    private AlphaAction fadeOut;
+    private int type;
 
     public Dot(TextureRegion dot) {
         this.dot = new TextureRegion(dot);
         setBounds(getX(), getY(), this.dot.getRegionWidth(), this.dot.getRegionHeight());
         random = new Random();
+        fadeIn = new AlphaAction() {
+            @Override
+            public boolean act(float delta) {
+                boolean complete = super.act(delta);
+                if (complete) {
+                    if (listener != null) {
+                        listener.onFadeInComplete(type);
+                    }
+                    fadeIn.reset();
+                }
+                return complete;
+            }
+        };
+        fadeOut = new AlphaAction() {
+            @Override
+            public boolean act(float delta) {
+                boolean complete = super.act(delta);
+                if (complete) {
+                    if (listener != null) {
+                        listener.onFadeOutComplete(type);
+                    }
+                    fadeOut.reset();
+                }
+                return complete;
+            }
+        };
     }
 
     public void setOnFadeCompleteListener(OnFadeCompleteListener listener) {
@@ -54,40 +81,18 @@ public class Dot extends Actor {
         setRotation(rotation);
     }
 
-    public void fadeOut(final int type) {
-        AlphaAction alphaAction = new AlphaAction() {
-            @Override
-            public boolean act(float delta) {
-                boolean complete = super.act(delta);
-                if (complete) {
-                    if (listener != null) {
-                        listener.onFadeOutComplete(type);
-                    }
-                }
-                return complete;
-            }
-        };
-        alphaAction.setAlpha(0f);
-        alphaAction.setDuration(0.1f);
-        addAction(alphaAction);
+    public void fadeOut(int type) {
+        this.type = type;
+        fadeOut.setAlpha(0f);
+        fadeOut.setDuration(0.15f);
+        addAction(fadeOut);
     }
 
-    public void fadeIn(final int type) {
-        final AlphaAction alphaAction = new AlphaAction() {
-            @Override
-            public boolean act(float delta) {
-                boolean complete = super.act(delta);
-                if (complete) {
-                    if (listener != null) {
-                        listener.onFadeInComplete(type);
-                    }
-                }
-                return complete;
-            }
-        };
-        alphaAction.setAlpha(1);
-        alphaAction.setDuration(0.15f);
-        addAction(alphaAction);
+    public void fadeIn(int type) {
+        this.type = type;
+        fadeIn.setAlpha(1);
+        fadeIn.setDuration(0.1f);
+        addAction(fadeIn);
     }
 
     @Override

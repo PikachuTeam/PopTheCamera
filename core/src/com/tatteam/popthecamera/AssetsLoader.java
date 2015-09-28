@@ -76,7 +76,7 @@ public class AssetsLoader {
     }
 
     public static enum ViewPortSize {
-        LOW(512, 853),
+        LOW(550, 853),
         MEDIUM(768, 1280),
         HIGH(1152, 1920);
 
