@@ -582,9 +582,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 break;
             case 2:
                 index.setText("" + currentIndex);
-                if (currentIndex % 10 == 0) {
-                    index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
-                } else if (number % 10 == 0 && (currentIndex + 1) % 10 == 0) {
+                if ((currentIndex + 1) % 10 == 0 || currentIndex == number) {
                     index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
                 }
                 break;
