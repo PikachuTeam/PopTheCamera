@@ -6,8 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
-
-import javafx.scene.shape.MoveTo;
+import com.tatteam.popthecamera.Constants;
 
 /**
  * Created by dongc_000 on 9/25/2015.
@@ -57,10 +56,10 @@ public class CameraButton extends Actor {
         float defaultY = getY();
 
         press.setPosition(defaultX, defaultY - 10f);
-        press.setDuration(0.2f);
+        press.setDuration(Constants.CAMERA_BUTTON_PRESS_DURATION);
 
         release.setPosition(defaultX, defaultY);
-        release.setDuration(0.15f);
+        release.setDuration(Constants.CAMERA_BUTTON_RELEASE_DURATION);
 
         addAction(new SequenceAction(press, release));
     }

@@ -53,6 +53,15 @@ public class ActorGroup {
         };
     }
 
+    public float getY() {
+        return actors.getY();
+    }
+
+    public float getX() {
+        return actors.getX();
+    }
+
+
     public Group getActors() {
         return actors;
     }

@@ -62,14 +62,16 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public void create() {
-        Log.enableLog = true;
+        Log.enableLog = false;
         loadData();
+
+        AssetsLoader.getInstance().init();
 
         stage = new Stage();
         splashStage = new Stage();
 
         camera = new OrthographicCamera();
-        fitViewport = new FitViewport(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT, camera);
+        fitViewport = new FitViewport(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), camera);
         camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
         stage.setViewport(fitViewport);
 
@@ -83,7 +85,9 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
         SoundHelper.getInstance().initSound();
 
-        atlas = new TextureAtlas(Gdx.files.internal("images/large/pop_the_camera.pack"));
+        Log.writeLog("Check path", AssetsLoader.getInstance().getImagePath());
+        Log.writeLog("Check viewport size", "" + fitViewport.getWorldWidth());
+        atlas = new TextureAtlas(Gdx.files.internal(AssetsLoader.getInstance().getImagePath() + "pop_the_camera.pack"));
 
         ColorHelper.getInstance().initColor();
         currentBackgroundColor = ColorHelper.getInstance().getNormalColor(0);
@@ -151,7 +155,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         cameraButton.setOnPressFinishListener(this);
 
         cameraGroup.setSize(background.getWidth(), background.getHeight());
-        cameraGroup.setPosition(Constants.VIEWPORT_WIDTH / 2 - cameraGroup.getWidth() / 2, Constants.VIEWPORT_HEIGHT / 2 - cameraGroup.getHeight() / 2);
+        cameraGroup.setPosition(fitViewport.getWorldWidth() / 2 - cameraGroup.getWidth() / 2, fitViewport.getWorldHeight() / 2 - cameraGroup.getHeight() / 2);
         cameraGroup.setOrigin(cameraGroup.getWidth() / 2, cameraGroup.getHeight() / 2);
 
         cameraButton.setPosition(cameraButton.getWidth(), cameraGroup.getHeight() - cameraButton.getHeight() * 3.85f);
@@ -164,7 +168,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         cameraGroup.addActor(lensGroup.getActors());
         cameraGroup.setOnShakeCompleteListener(this);
 
-        indicator.setAccelerator(1.7f);
+        indicator.setAccelerator(Constants.DOT_ROTATION_ACCELERATOR);
 
         initTextView();
     }
@@ -199,7 +203,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
         float dotRadius = lens3.getHeight() / 2 + dotOffset / 2;
         float indicatorRadius = lens3.getHeight() / 2 + indicatorOffset / 2;
-        indicatorBeta = Math.toDegrees(Math.acos((2 * indicatorRadius * indicatorRadius - indicator.getWidth() * indicator.getWidth()) / (2 * indicatorRadius * indicatorRadius )));
+        indicatorBeta = Math.toDegrees(Math.acos((2 * indicatorRadius * indicatorRadius - indicator.getWidth() * indicator.getWidth()) / (2 * indicatorRadius * indicatorRadius)));
         dotBeta = Math.toDegrees(Math.acos((2 * dotRadius * dotRadius - dot.getWidth() * dot.getWidth()) / (2 * dotRadius * dotRadius)));
 
         // set color
@@ -233,7 +237,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (touchable) {
-            camera.unproject(touchPoint.set(screenX, screenY, 0));
+            splashCamera.unproject(touchPoint.set(screenX, screenY, 0));
             if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
                 soundButton.setImage("press_sound");
             } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
@@ -241,6 +245,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
             } else if (playAgain) {
                 dot.fadeOut(1);
                 indicator.fadeOut();
+                updateTextView(2);
                 checkable = false;
             } else {
                 if (!indicator.isMoving) {
@@ -248,7 +253,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 } else {
                     double indicationRotation = recalculateAngleIfNeed(indicator.getRotation());
                     double delta;
-
                     if (indicator.clockwise) {
                         if (indicationRotation == 0) {
                             indicationRotation = 360;
@@ -348,7 +352,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public void onShakeComplete() {
         touchable = true;
-        updateTextView(2);
     }
 
     // situation: 1-win; 2-lose
@@ -495,16 +498,16 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     }
 
     private void initTextView() {
-        level = new TextView(Gdx.files.internal("fonts/large/calibri.fnt"), Gdx.files.internal("fonts/large/calibri.png"));
-        index = new TextView(Gdx.files.internal("fonts/large/calibri_index.fnt"), Gdx.files.internal("fonts/large/calibri_index.png"));
+        level = new TextView(Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri.fnt"), Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri.png"));
+        index = new TextView(Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri_index.fnt"), Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri_index.png"));
         level.setText("Level " + number);
         index.setText("" + currentIndex);
 
         stage.addActor(level);
         stage.addActor(index);
 
-        level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 4 - level.getHeight() / 4);
-        index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2, 3 * stage.getViewport().getWorldHeight() / 4 + 1.2f * index.getHeight());
+        level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 4 - level.getHeight());
+        index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2, 3 * stage.getViewport().getWorldHeight() / 4 + 1.75f * index.getHeight());
     }
 
     private void initButton() {
@@ -513,7 +516,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         } else {
             soundButton = new Button(atlas, "off_sound");
         }
-        soundButton.setPosition(stage.getViewport().getWorldWidth() - 5 * soundButton.getWidth() / 4f, stage.getViewport().getWorldHeight() - 5 * soundButton.getHeight() / 4f);
+        soundButton.setPosition(fitViewport.getWorldWidth() - soundButton.getWidth() * 1.25f, fitViewport.getWorldHeight() - soundButton.getHeight() * 1.25f);
         soundButton.addTo(stage);
         if (VibrationHelper.enableVibration) {
             vibrationButton = new Button(atlas, "on_vibrate");
@@ -526,8 +529,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     private void loadData() {
         preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
-//        number = preferences.getInteger("number", 1);
-        number = 1;
+        number = preferences.getInteger("number", 1);
         currentIndex = number;
         SoundHelper.enableSound = preferences.getBoolean("sound", true);
         VibrationHelper.enableVibration = preferences.getBoolean("vibration", true);

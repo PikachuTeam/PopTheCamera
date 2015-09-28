@@ -1,11 +1,8 @@
 package com.tatteam.popthecamera.actors;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -60,7 +57,7 @@ public class AlphaRectangle extends Actor {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         rectangle.begin(ShapeRenderer.ShapeType.Filled);
-        rectangle.setColor(ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex()));
+        rectangle.setColor(ColorHelper.FLASH_COLOR);
         rectangle.rect(0, 0, width, height);
         rectangle.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);

@@ -15,6 +15,7 @@ public class ColorHelper {
     private int index;
     private int length;
     public final static Color FAIL_COLOR = new Color(0xff2d2dff);
+    public final static Color FLASH_COLOR = new Color(0.93f, 0.93f, 0.93f, 0.37f);
 
     private ColorHelper() {
     }
