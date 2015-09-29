@@ -158,7 +158,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         cameraButton.setPosition(cameraButton.getWidth(), cameraGroup.getHeight() - cameraButton.getHeight() * 3.85f);
 
         initLens();
-        lensGroup.setPosition(cameraGroup.getWidth() / 2 - lensGroup.getWidth() / 2, cameraGroup.getHeight() / 2 - lensGroup.getHeight() / 2 - 30);
+        lensGroup.setPosition(cameraGroup.getWidth() / 2 - lensGroup.getWidth() / 2, cameraGroup.getHeight() / 2 - lensGroup.getHeight() / 2 - (lens1.getHeight()/2 - lens2.getHeight()/2) / 3);
 
         cameraGroup.addActor(cameraButton);
         cameraGroup.addActor(background);
@@ -198,8 +198,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         dot.setOrigin(dot.getWidth() / 2, -(lens3.getHeight() / 2) - dotOffset / 2);
         dot.setOnFadeCompleteListener(this);
 
-        float dotRadius = lens3.getHeight() / 2 + dotOffset / 2;
-        float indicatorRadius = lens3.getHeight() / 2 + indicatorOffset / 2;
+        float dotRadius = lens3.getHeight() / 2 + dotOffset / 2 + dot.getHeight() / 2;
+        float indicatorRadius = lens3.getHeight() / 2 + indicatorOffset / 2 + indicator.getHeight() / 3;
         indicatorBeta = Math.toDegrees(Math.acos((2 * indicatorRadius * indicatorRadius - indicator.getWidth() * indicator.getWidth()) / (2 * indicatorRadius * indicatorRadius)));
         dotBeta = Math.toDegrees(Math.acos((2 * dotRadius * dotRadius - dot.getWidth() * dot.getWidth()) / (2 * dotRadius * dotRadius)));
 
@@ -213,7 +213,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         lensGroup.addActor(dot);
         lensGroup.addActor(indicator);
 
-        e = indicatorBeta / 4;
+        e = indicatorBeta / 2;
     }
 
     @Override
@@ -234,6 +234,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (touchable) {
+            touchable = false;
             camera.unproject(touchPoint.set(screenX, screenY, 0));
             if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
                 soundButton.setImage("press_sound");
@@ -310,6 +311,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        touchable = true;
         camera.unproject(touchPoint.set(screenX, screenY, 0));
         if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
             if (SoundHelper.enableSound) {
