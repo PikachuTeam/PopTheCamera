@@ -8,10 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 
 
 /**
@@ -26,29 +24,22 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = View.inflate(this.getActivity(), R.layout.fragment_home, null);
         mAdView = (AdView) view.findViewById(R.id.adView);
+        setupAds();
 
         btnClassicalMode = (Button) view.findViewById(R.id.btn_classical_mode);
         btnUnlimitedMode = (Button) view.findViewById(R.id.btn_unlimited_mode);
         btnClassicalMode.setOnClickListener(this);
         btnUnlimitedMode.setOnClickListener(this);
 
-        setupAds();
-
-
-        mInterstitialAd = new InterstitialAd(this.getActivity());
-        mInterstitialAd.setAdUnitId(getString(R.string.big_banner_ad_unit_id));
-        requestNewInterstitial();
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                requestNewInterstitial();
-            }
-        });
         return view;
     }
 
-    private void addGameFragment() {
+    private void addGameFragment(int gameMode) {
         GameFragment fragment = new GameFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(GameFragment.KEY_GAME_MODE, gameMode);
+        fragment.setArguments(bundle);
+
         FragmentTransaction trans = getFragmentManager().beginTransaction();
         trans.replace(R.id.container, fragment);
         trans.addToBackStack(GameFragment.class.getSimpleName());
@@ -67,15 +58,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view == btnClassicalMode) {
-            addGameFragment();
+            addGameFragment(GameFragment.GAME_MODE_CLASSIC_SLOW);
         } else if (view == btnUnlimitedMode) {
-            mInterstitialAd.show();
-//            requestNewInterstitial();
+            addGameFragment(GameFragment.GAME_MODE_CLASSIC_UNLIMITED);
         }
     }
-    InterstitialAd mInterstitialAd;
-    private void requestNewInterstitial() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mInterstitialAd.loadAd(adRequest);
-    }
+
 }

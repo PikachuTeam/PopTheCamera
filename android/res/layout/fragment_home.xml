@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#cc5759">
 
     <RelativeLayout
         android:id="@+id/layout_ads"
@@ -16,24 +17,25 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
+            android:visibility="gone"
             ads:adSize="SMART_BANNER"
             ads:adUnitId="@string/small_banner_ad_unit_id" />
-
-        <Button
-            android:id="@+id/btn_classical_mode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="117dp"
-            android:text="Classic" />
-
-        <Button
-            android:id="@+id/btn_unlimited_mode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="Unlimited" />
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_classical_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Classic"
+        android:layout_marginTop="30dp"/>
+
+    <Button
+        android:id="@+id/btn_unlimited_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="Unlimited" />
 </RelativeLayout>
