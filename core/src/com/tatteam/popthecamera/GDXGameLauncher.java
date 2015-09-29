@@ -20,7 +20,7 @@ import com.tatteam.popthecamera.actors.Indicator;
 import com.tatteam.popthecamera.actors.Lens;
 import com.tatteam.popthecamera.actors.TextView;
 
-public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener, Dot.OnFadeCompleteListener {
+public class GDXGameLauncher extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener, Dot.OnFadeCompleteListener {
 
     private Viewport fitViewport;
     private Viewport screenViewport;

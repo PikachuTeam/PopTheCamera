@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
 import com.tatteam.popthecamera.ColorHelper;
-import com.tatteam.popthecamera.Main;
+import com.tatteam.popthecamera.GDXGameLauncher;
 
 /**
  * Created by dongc_000 on 9/26/2015.
@@ -43,7 +43,7 @@ public class AlphaRectangle extends Actor {
 
     public void appear(Stage stage) {
         stage.addActor(this);
-        Main.touchable = false;
+        GDXGameLauncher.touchable = false;
         width = stage.getViewport().getWorldWidth();
         height = stage.getViewport().getWorldHeight();
         alphaAction.setAlpha(1f);
