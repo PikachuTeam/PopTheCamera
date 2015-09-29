@@ -26,8 +26,9 @@ public class SoundHelper {
 
     public void initSound() {
         successSound = Gdx.audio.newSound(Gdx.files.internal("sounds/success.wav"));
-        failSound = Gdx.audio.newSound(Gdx.files.internal("sounds/fail.wav"));
+        failSound = Gdx.audio.newSound(Gdx.files.internal("sounds/fail.mp3"));
         finishLevelSound = Gdx.audio.newSound(Gdx.files.internal("sounds/finish_level.wav"));
+
     }
 
     public void playSuccessSound() {
@@ -38,7 +39,7 @@ public class SoundHelper {
 
     public void playFailSound() {
         if (enableSound) {
-            failSound.play();
+            failSound.play(0.5f);
         }
     }
 

@@ -66,6 +66,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         loadData();
 
         AssetsLoader.getInstance().init();
+        SoundHelper.getInstance().initSound();
 
         stage = new Stage();
         splashStage = new Stage();
@@ -83,10 +84,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         rectangle = new AlphaRectangle();
         rectangle.setOnDisappearListener(this);
 
-        SoundHelper.getInstance().initSound();
-
-        Log.writeLog("Check path", AssetsLoader.getInstance().getImagePath());
-        Log.writeLog("Check viewport size", "" + fitViewport.getWorldWidth());
         atlas = new TextureAtlas(Gdx.files.internal(AssetsLoader.getInstance().getImagePath() + "pop_the_camera.pack"));
 
         ColorHelper.getInstance().initColor();
@@ -237,7 +234,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (touchable) {
-            splashCamera.unproject(touchPoint.set(screenX, screenY, 0));
+            camera.unproject(touchPoint.set(screenX, screenY, 0));
             if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
                 soundButton.setImage("press_sound");
             } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
