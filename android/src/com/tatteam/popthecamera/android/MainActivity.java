@@ -6,57 +6,58 @@ import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.Toast;
 
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.tatteam.popthecamera.Main;
 
 import hotchemi.android.rate.AppRate;
 import hotchemi.android.rate.OnClickButtonListener;
 
 public class MainActivity extends FragmentActivity implements AndroidFragmentApplication.Callbacks {
-    private static final long SPLASH_DURATION = 2000;
-    private static final boolean ADS_ENABLE = false;
+    public static final boolean ADS_ENABLE = true;
 
-    private View layout_flash,layout_flash_background;
+    private View layout_flash, layout_flash_background;
     private boolean isBackKeyAvailable = false;
     private long backPressed;
     private AppRate appRate;
 
-    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         LocalSharedPreferManager.getInstance().init(getApplicationContext());
-
         setupRateAppDialog();
-        setupAds();
+        addHomeFragment();
         displaySplashScreen();
-        addGameFragment();
+
+    }
+
+    private void addHomeFragment() {
+        HomeFragment fragment = new HomeFragment();
+        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+        trans.replace(R.id.container, fragment);
+        trans.commit();
+
     }
 
     @Override
     public void onBackPressed() {
         if (isBackKeyAvailable) {
-            if(!showRateAppDialog()){
-                handleDoubleBackToExit();
+            android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+            if (fragmentManager != null && fragmentManager.getBackStackEntryCount() > 0) {
+                super.onBackPressed();
+            } else {
+                if (!showRateAppDialog()) {
+                    handleDoubleBackToExit();
+                }
+
             }
+
         }
     }
 
-    @Override
-    public void exit() {
-
-    }
 
     @Override
     protected void onDestroy() {
@@ -75,8 +76,8 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
             public void onClick(View view) {
             }
         });
-        ObjectAnimator set1 =ObjectAnimator.ofFloat(layout_flash, "alpha", 0.0f, 1f).setDuration(750);
-        ObjectAnimator set2 =ObjectAnimator.ofFloat(layout_flash, "alpha", 1f, 1f).setDuration(700);
+        ObjectAnimator set1 = ObjectAnimator.ofFloat(layout_flash, "alpha", 0.0f, 1f).setDuration(750);
+        ObjectAnimator set2 = ObjectAnimator.ofFloat(layout_flash, "alpha", 1f, 1f).setDuration(700);
         set2.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -98,7 +99,7 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
 
             }
         });
-        ObjectAnimator set3 =ObjectAnimator.ofFloat(layout_flash, "alpha", 1f, 0f).setDuration(750);
+        ObjectAnimator set3 = ObjectAnimator.ofFloat(layout_flash, "alpha", 1f, 0f).setDuration(750);
         set3.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -122,26 +123,10 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
             }
         });
         AnimatorSet set = new AnimatorSet();
-        set.playSequentially(set1,set2,set3);
+        set.playSequentially(set1, set2, set3);
         set.start();
     }
 
-    private void addGameFragment() {
-        GameFragment fragment = new GameFragment();
-        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
-        trans.replace(R.id.container, fragment);
-        trans.commit();
-    }
-
-    private void setupAds() {
-        mAdView = (AdView) findViewById(R.id.adView);
-        if (ADS_ENABLE) {
-            AdRequest adRequest = new AdRequest.Builder().build();
-            mAdView.loadAd(adRequest);
-        } else {
-            mAdView.setVisibility(View.GONE);
-        }
-    }
 
     private void setupRateAppDialog() {
         LocalSharedPreferManager.getInstance().setRateAppLaunchTime();
@@ -183,12 +168,8 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
         }
     }
 
-    public static class GameFragment extends AndroidFragmentApplication {
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-            return initializeForView(new Main(), config);
-        }
-    }
+    @Override
+    public void exit() {
 
+    }
 }

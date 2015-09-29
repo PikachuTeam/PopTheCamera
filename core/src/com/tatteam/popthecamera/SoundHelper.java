@@ -32,21 +32,15 @@ public class SoundHelper {
     }
 
     public void playSuccessSound() {
-        if (enableSound) {
-            successSound.play();
-        }
+        playSuccessSound(1f);
     }
 
     public void playFailSound() {
-        if (enableSound) {
-            failSound.play(0.5f);
-        }
+        playFailSound(1f);
     }
 
     public void playFinishLevelSound() {
-        if (enableSound) {
-            finishLevelSound.play();
-        }
+        playFinishLevelSound(1f);
     }
 
     public void playSuccessSound(float volume) {
@@ -69,10 +63,10 @@ public class SoundHelper {
 
     public void dispose() {
         if (instance != null) {
-            instance = null;
             successSound.dispose();
             failSound.dispose();
             finishLevelSound.dispose();
+            instance = null;
         }
     }
 }

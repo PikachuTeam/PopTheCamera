@@ -4,10 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -22,10 +20,8 @@ import com.tatteam.popthecamera.actors.Indicator;
 import com.tatteam.popthecamera.actors.Lens;
 import com.tatteam.popthecamera.actors.TextView;
 
-public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener, Dot.OnFadeCompleteListener {
+public class GDXGameLauncher extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener, Dot.OnFadeCompleteListener {
 
-    private OrthographicCamera camera;
-    private Camera splashCamera;
     private Viewport fitViewport;
     private Viewport screenViewport;
     private Indicator indicator;
@@ -63,6 +59,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public void create() {
         Log.enableLog = false;
+        touchable = true;
         loadData();
 
         AssetsLoader.getInstance().init();
@@ -71,14 +68,12 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         stage = new Stage();
         splashStage = new Stage();
 
-        camera = new OrthographicCamera();
-        fitViewport = new FitViewport(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), camera);
-        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+        fitViewport = new FitViewport(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight());
+        fitViewport.update(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), true);
         stage.setViewport(fitViewport);
 
-        splashCamera = new OrthographicCamera(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
-        screenViewport = new ScreenViewport(splashCamera);
-        splashCamera.position.set(splashCamera.viewportWidth / 2, splashCamera.viewportHeight / 2, 0);
+        screenViewport = new ScreenViewport();
+        screenViewport.update(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), true);
         splashStage.setViewport(screenViewport);
 
         rectangle = new AlphaRectangle();
@@ -137,10 +132,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public void resize(int width, int height) {
-        fitViewport.update(width, height);
-        screenViewport.update(width, height);
-        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
-        splashCamera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+        fitViewport.update(width, height, true);
+        screenViewport.update(width, height, true);
     }
 
     private void init() {
@@ -158,14 +151,14 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         cameraButton.setPosition(cameraButton.getWidth(), cameraGroup.getHeight() - cameraButton.getHeight() * 3.85f);
 
         initLens();
-        lensGroup.setPosition(cameraGroup.getWidth() / 2 - lensGroup.getWidth() / 2, cameraGroup.getHeight() / 2 - lensGroup.getHeight() / 2 - 30);
+        lensGroup.setPosition(cameraGroup.getWidth() / 2 - lensGroup.getWidth() / 2, cameraGroup.getHeight() / 2 - lensGroup.getHeight() / 2 - (lens1.getHeight() / 2 - lens2.getHeight() / 2) / 3);
 
         cameraGroup.addActor(cameraButton);
         cameraGroup.addActor(background);
         cameraGroup.addActor(lensGroup.getActors());
         cameraGroup.setOnShakeCompleteListener(this);
 
-        indicator.setAccelerator(Constants.DOT_ROTATION_ACCELERATOR);
+        indicator.setSpeed(Constants.DOT_ROTATION_SPEED);
 
         initTextView();
     }
@@ -198,8 +191,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         dot.setOrigin(dot.getWidth() / 2, -(lens3.getHeight() / 2) - dotOffset / 2);
         dot.setOnFadeCompleteListener(this);
 
-        float dotRadius = lens3.getHeight() / 2 + dotOffset / 2;
-        float indicatorRadius = lens3.getHeight() / 2 + indicatorOffset / 2;
+        float dotRadius = lens3.getHeight() / 2 + dotOffset / 2 + dot.getHeight() / 2;
+        float indicatorRadius = lens3.getHeight() / 2 + indicatorOffset / 2 + indicator.getHeight() / 3;
         indicatorBeta = Math.toDegrees(Math.acos((2 * indicatorRadius * indicatorRadius - indicator.getWidth() * indicator.getWidth()) / (2 * indicatorRadius * indicatorRadius)));
         dotBeta = Math.toDegrees(Math.acos((2 * dotRadius * dotRadius - dot.getWidth() * dot.getWidth()) / (2 * dotRadius * dotRadius)));
 
@@ -213,7 +206,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         lensGroup.addActor(dot);
         lensGroup.addActor(indicator);
 
-        e = indicatorBeta / 4;
+        e = indicatorBeta / 2;
     }
 
     @Override
@@ -234,7 +227,10 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (touchable) {
-            camera.unproject(touchPoint.set(screenX, screenY, 0));
+            touchPoint.set(screenX, screenY, 0);
+            fitViewport.unproject(touchPoint);
+            Log.writeLog("Check touch point", "" + touchPoint.x + " " + touchPoint.y);
+            Log.writeLog("Sound button coordinate", "" + soundButton.getX() + " " + soundButton.getY());
             if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
                 soundButton.setImage("press_sound");
             } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
@@ -310,7 +306,8 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        camera.unproject(touchPoint.set(screenX, screenY, 0));
+        touchPoint.set(screenX, screenY, 0);
+        fitViewport.unproject(touchPoint);
         if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
             if (SoundHelper.enableSound) {
                 soundButton.setImage("off_sound");
@@ -566,6 +563,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 indicator.clockwise = true;
             }
         }
+        touchable = true;
         checkable = true;
     }
 

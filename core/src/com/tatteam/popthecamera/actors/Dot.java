@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
+import com.tatteam.popthecamera.GDXGameLauncher;
 
 import java.util.Random;
 
@@ -82,6 +83,7 @@ public class Dot extends Actor {
     }
 
     public void fadeOut(int type) {
+        GDXGameLauncher.touchable=false;
         this.type = type;
         fadeOut.setAlpha(0f);
         fadeOut.setDuration(0.15f);
