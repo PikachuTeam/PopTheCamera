@@ -158,7 +158,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         cameraButton.setPosition(cameraButton.getWidth(), cameraGroup.getHeight() - cameraButton.getHeight() * 3.85f);
 
         initLens();
-        lensGroup.setPosition(cameraGroup.getWidth() / 2 - lensGroup.getWidth() / 2, cameraGroup.getHeight() / 2 - lensGroup.getHeight() / 2 - (lens1.getHeight()/2 - lens2.getHeight()/2) / 3);
+        lensGroup.setPosition(cameraGroup.getWidth() / 2 - lensGroup.getWidth() / 2, cameraGroup.getHeight() / 2 - lensGroup.getHeight() / 2 - (lens1.getHeight() / 2 - lens2.getHeight() / 2) / 3);
 
         cameraGroup.addActor(cameraButton);
         cameraGroup.addActor(background);
@@ -234,7 +234,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (touchable) {
-            touchable = false;
+//            touchable = false;
             camera.unproject(touchPoint.set(screenX, screenY, 0));
             if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
                 soundButton.setImage("press_sound");
@@ -311,7 +311,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        touchable = true;
         camera.unproject(touchPoint.set(screenX, screenY, 0));
         if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
             if (SoundHelper.enableSound) {
@@ -516,6 +515,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
             soundButton = new Button(atlas, "off_sound");
         }
         soundButton.setPosition(fitViewport.getWorldWidth() - soundButton.getWidth() * 1.25f, fitViewport.getWorldHeight() - soundButton.getHeight() * 1.25f);
+//        soundButton.setPosition(cameraGroup.getX() + cameraGroup.getWidth() - soundButton.getWidth(), cameraGroup.getY() + cameraGroup.getHeight() + soundButton.getHeight());
         soundButton.addTo(stage);
         if (VibrationHelper.enableVibration) {
             vibrationButton = new Button(atlas, "on_vibrate");
@@ -568,6 +568,7 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
                 indicator.clockwise = true;
             }
         }
+        touchable = true;
         checkable = true;
     }
 
