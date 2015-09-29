@@ -1,7 +1,11 @@
 package com.tatteam.popthecamera;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Json;
+
+import java.util.ArrayList;
 
 /**
  * Created by the_e_000 on 9/26/2015.
@@ -21,42 +25,20 @@ public class ColorHelper {
     }
 
     public void initColor() {
-        brightestColor = new Color[]{
-                new Color(0x00838fff),
-                new Color(0xdf96d2ff),
-                new Color(0x00ae63ff),
-                new Color(0xddd8abff),
-                new Color(0x8686d2ff),
-                new Color(0x905b74ff),
-                new Color(0x4a9cd1ff),
-                new Color(0x4ad190ff),
-                new Color(0xda9273ff),
-                new Color(0xdf989aff)
-        };
-        normalColor = new Color[]{
-                new Color(0x006064ff),
-                new Color(0xc74fb2ff),
-                new Color(0x008d50ff),
-                new Color(0xb4ad71ff),
-                new Color(0x4a4aa3ff),
-                new Color(0x83405fff),
-                new Color(0x3381b3ff),
-                new Color(0x32b777ff),
-                new Color(0xbf7555ff),
-                new Color(0xcd6366ff)
-        };
-        darkestColor = new Color[]{
-                new Color(0x004d50ff),
-                new Color(0xaa2192ff),
-                new Color(0x015732ff),
-                new Color(0x857f50ff),
-                new Color(0x3a3a70ff),
-                new Color(0x7e254eff),
-                new Color(0x16547cff),
-                new Color(0x0f834bff),
-                new Color(0xa35838ff),
-                new Color(0xc15356ff)
-        };
+
+        Json json = new Json();
+        ColorFactory colorFactory = json.fromJson(ColorFactory.class,
+                Gdx.files.internal("colors/color_items.json"));
+
+        brightestColor = new Color[colorFactory.colors.size()];
+        normalColor = new Color[colorFactory.colors.size()];
+        darkestColor = new Color[colorFactory.colors.size()];
+
+        for (int i = 0; i < colorFactory.colors.size(); i++) {
+            brightestColor[i] = new Color(Color.valueOf(colorFactory.colors.get(i).len2));
+            normalColor[i] = new Color(Color.valueOf(colorFactory.colors.get(i).len3));
+            darkestColor[i] = new Color(Color.valueOf(colorFactory.colors.get(i).len4));
+        }
         length = brightestColor.length;
         index = 0;
     }
@@ -113,5 +95,13 @@ public class ColorHelper {
             normalColor = null;
             darkestColor = null;
         }
+    }
+
+    private static class ColorFactory {
+        ArrayList<ColorItem> colors;
+    }
+
+    private static class ColorItem {
+        String len2, len3, len4;
     }
 }
