@@ -31,6 +31,7 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
         setupRateAppDialog();
         addHomeFragment();
         displaySplashScreen();
+
     }
 
     private void addHomeFragment() {
@@ -38,6 +39,7 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
         FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
         trans.replace(R.id.container, fragment);
         trans.commit();
+
     }
 
     @Override
@@ -50,14 +52,12 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
                 if (!showRateAppDialog()) {
                     handleDoubleBackToExit();
                 }
+
             }
+
         }
     }
 
-    @Override
-    public void exit() {
-
-    }
 
     @Override
     protected void onDestroy() {
@@ -168,4 +168,8 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
         }
     }
 
+    @Override
+    public void exit() {
+
+    }
 }
