@@ -56,6 +56,10 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public static boolean touchable = true;
     private static boolean checkable = true;
 
+    private GameMode gameMode = GameMode.CLASSIC_MEDIUM;
+    private OnGameListener onGameListener;
+    private int unlimitedScore = 0;
+
     @Override
     public void create() {
         Log.enableLog = false;
@@ -158,8 +162,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         cameraGroup.addActor(lensGroup.getActors());
         cameraGroup.setOnShakeCompleteListener(this);
 
-        indicator.setSpeed(Constants.DOT_ROTATION_SPEED);
-
+        indicator.setSpeed(gameMode.getSpeed());
         initTextView();
     }
 
@@ -276,7 +279,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
                         Log.writeLog("Ting ting.");
                         SoundHelper.getInstance().playSuccessSound();
-                        if (currentIndex != 0) {
+                        if (currentIndex != 0 || gameMode == GameMode.UNLIMITED) {
+                            increaseUnlimitedSeedIfNeeded();
                             currentOrientation = indicator.clockwise;
                             dot.fadeOut(2);
                             if (indicator.clockwise) {
@@ -288,6 +292,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         } else {
                             stopGame(1);
                         }
+
                     } else {
                         Log.writeLog("Check touch");
                         Log.writeLog("Indicator Rotation", "" + indicationRotation);
@@ -362,6 +367,10 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 touchable = false;
                 VibrationHelper.vibrate(1);
                 currentBackgroundColor = ColorHelper.FAIL_COLOR;
+                if (this.onGameListener != null) {
+                    onGameListener.onLossGame(this, gameMode, number, currentIndex);
+                }
+                saveAndResetScoreAtUnlimitedModeIfNeeded();
                 break;
         }
         currentIndex = number;
@@ -582,5 +591,77 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 }
                 break;
         }
+    }
+
+    public void setOnGameListener(OnGameListener onGameListener) {
+        this.onGameListener = onGameListener;
+    }
+
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+
+    private void saveAndResetScoreAtUnlimitedModeIfNeeded(){
+        if (gameMode == GameMode.UNLIMITED) {
+            //save high unlimitedScore first
+            unlimitedScore = 0;
+            gameMode.resetUnlimitedSpeed();
+        }
+    }
+
+    private void increaseUnlimitedSeedIfNeeded(){
+        if(gameMode==GameMode.UNLIMITED){
+            unlimitedScore++;
+            if(unlimitedScore %GameMode.UNLIMITED_INCREASING_POINT==0){
+                indicator.setSpeed(gameMode.getUnlimitedNewSpeed());
+//                Log.writeLog(unlimitedScore + " - >>>>>>>>>>>>>>>>>>> - " + gameMode.getSpeed());
+            }
+        }
+    }
+
+    public static enum GameMode{
+        CLASSIC_SLOW(1.2f),
+        CLASSIC_MEDIUM(1.7f),
+        CLASSIC_FAST(2.2f),
+        CLASSIC_CRAZY(2.7f),
+        UNLIMITED(1.2f);//start from 1.2 and increase after each two level
+
+        public static final int UNLIMITED_INCREASING_POINT = 1;
+        public static final float UNLIMITED_MAX_SPEED = 2.7f;
+
+        private float speed;
+        private float increasingSpeed = 0.01f;
+
+        private GameMode(float speed){
+            this.speed = speed;
+        }
+
+        public float getSpeed() {
+            return speed;
+        }
+
+        public float getUnlimitedNewSpeed(){
+            if(this == UNLIMITED) {
+                if(speed<UNLIMITED_MAX_SPEED) {
+                    speed += increasingSpeed;
+                }
+                return speed;
+            }
+            return 0;
+        }
+
+        public void resetUnlimitedSpeed(){
+            if(this == UNLIMITED) {
+                this.speed = 1.2f;
+            }
+        }
+    }
+
+    public static interface OnGameListener{
+        public void onLossGame(GDXGameLauncher gameLauncher, GameMode gameMode, int currentLevel, int breakPoint);
     }
 }
