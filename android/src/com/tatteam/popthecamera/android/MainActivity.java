@@ -17,6 +17,7 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.tatteam.popthecamera.Main;
+import com.tatteam.popthecamera.PopTheCamera;
 
 import hotchemi.android.rate.AppRate;
 import hotchemi.android.rate.OnClickButtonListener;
@@ -25,7 +26,7 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
     private static final long SPLASH_DURATION = 2000;
     private static final boolean ADS_ENABLE = false;
 
-    private View layout_flash,layout_flash_background;
+    private View layout_flash, layout_flash_background;
     private boolean isBackKeyAvailable = false;
     private long backPressed;
     private AppRate appRate;
@@ -42,12 +43,13 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
         setupAds();
         displaySplashScreen();
         addGameFragment();
+
     }
 
     @Override
     public void onBackPressed() {
         if (isBackKeyAvailable) {
-            if(!showRateAppDialog()){
+            if (!showRateAppDialog()) {
                 handleDoubleBackToExit();
             }
         }
@@ -75,8 +77,8 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
             public void onClick(View view) {
             }
         });
-        ObjectAnimator set1 =ObjectAnimator.ofFloat(layout_flash, "alpha", 0.0f, 1f).setDuration(750);
-        ObjectAnimator set2 =ObjectAnimator.ofFloat(layout_flash, "alpha", 1f, 1f).setDuration(700);
+        ObjectAnimator set1 = ObjectAnimator.ofFloat(layout_flash, "alpha", 0.0f, 1f).setDuration(750);
+        ObjectAnimator set2 = ObjectAnimator.ofFloat(layout_flash, "alpha", 1f, 1f).setDuration(700);
         set2.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -98,7 +100,7 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
 
             }
         });
-        ObjectAnimator set3 =ObjectAnimator.ofFloat(layout_flash, "alpha", 1f, 0f).setDuration(750);
+        ObjectAnimator set3 = ObjectAnimator.ofFloat(layout_flash, "alpha", 1f, 0f).setDuration(750);
         set3.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -122,7 +124,7 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
             }
         });
         AnimatorSet set = new AnimatorSet();
-        set.playSequentially(set1,set2,set3);
+        set.playSequentially(set1, set2, set3);
         set.start();
     }
 
@@ -187,7 +189,7 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-            return initializeForView(new Main(), config);
+            return initializeForView(new PopTheCamera(), config);
         }
     }
 

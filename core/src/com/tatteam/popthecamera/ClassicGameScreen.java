@@ -1,9 +1,9 @@
 package com.tatteam.popthecamera;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -20,7 +20,10 @@ import com.tatteam.popthecamera.actors.Indicator;
 import com.tatteam.popthecamera.actors.Lens;
 import com.tatteam.popthecamera.actors.TextView;
 
-public class Main extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener, Dot.OnFadeCompleteListener {
+/**
+ * Created by dongc_000 on 9/29/2015.
+ */
+public class ClassicGameScreen implements Screen, InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener, Dot.OnFadeCompleteListener {
 
     private Viewport fitViewport;
     private Viewport screenViewport;
@@ -56,13 +59,9 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     public static boolean touchable = true;
     private static boolean checkable = true;
 
-    @Override
-    public void create() {
+    public ClassicGameScreen() {
         Log.enableLog = false;
         loadData();
-
-        AssetsLoader.getInstance().init();
-        SoundHelper.getInstance().initSound();
 
         stage = new Stage();
         splashStage = new Stage();
@@ -103,7 +102,12 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     }
 
     @Override
-    public void render() {
+    public void show() {
+
+    }
+
+    @Override
+    public void render(float delta) {
         Gdx.gl.glClearColor(currentBackgroundColor.r, currentBackgroundColor.g, currentBackgroundColor.b, currentBackgroundColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -119,6 +123,27 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
     }
 
     @Override
+    public void resize(int width, int height) {
+        fitViewport.update(width, height, true);
+        screenViewport.update(width, height, true);
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
     public void dispose() {
         saveData();
         stage.dispose();
@@ -126,13 +151,6 @@ public class Main extends ApplicationAdapter implements InputProcessor, ActorGro
         SoundHelper.getInstance().dispose();
         soundButton.dispose();
         atlas.dispose();
-        super.dispose();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        fitViewport.update(width, height, true);
-        screenViewport.update(width, height, true);
     }
 
     private void init() {

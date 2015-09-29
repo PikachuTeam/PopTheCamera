@@ -17,6 +17,6 @@ public class Constants {
     public final static float CAMERA_BUTTON_PRESS_DURATION = 0.4f;
     public final static float CAMERA_BUTTON_RELEASE_DURATION = 0.25f;
 
-    public final static float DOT_ROTATION_ACCELERATOR = 1.85f;
+    public final static float DOT_ROTATION_SPEED = 1.85f;
 
 }

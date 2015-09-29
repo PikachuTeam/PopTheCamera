@@ -15,7 +15,7 @@ public class Indicator extends Actor {
     public boolean isMoving = false;
     public boolean clockwise = true;
     private float angle = 0;
-    private float accelerator;
+    private float speed;
     private AlphaAction fadeIn;
     private AlphaAction fadeOut;
 
@@ -43,11 +43,11 @@ public class Indicator extends Actor {
                 return complete;
             }
         };
-        accelerator = 1;
+        speed = 1;
     }
 
-    public void setAccelerator(float accelerator) {
-        this.accelerator = accelerator;
+    public void setSpeed(float speed) {
+        this.speed = speed;
     }
 
     public void resetAngle() {
@@ -74,9 +74,9 @@ public class Indicator extends Actor {
         batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
         if (isMoving) {
             if (clockwise) {
-                angle = (angle - accelerator) % 360;
+                angle = (angle - speed) % 360;
             } else {
-                angle = (angle + accelerator) % 360;
+                angle = (angle + speed) % 360;
             }
             setRotation(angle);
         }
