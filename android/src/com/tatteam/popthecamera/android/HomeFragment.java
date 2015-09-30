@@ -75,7 +75,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
 
     private void setupAds() {
-        if (MainActivity.ADS_ENABLE) {
+        if (MainActivity.ADS_ENABLE && LocalSharedPreferManager.getInstance().isRateAppOverLaunchTime(4)) {
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         } else {

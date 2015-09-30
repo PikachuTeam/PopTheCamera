@@ -28,11 +28,11 @@ public class GameFragment extends AndroidFragmentApplication implements GDXGameL
     private Handler handler;
 
     private InterstitialAd interstitialAd;
-    private int lossClassicGameCounter;
+    private int lossGameCounter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        lossClassicGameCounter = 0;
+        lossGameCounter = 0;
         handler = new Handler();
         setupAds();
 
@@ -62,26 +62,48 @@ public class GameFragment extends AndroidFragmentApplication implements GDXGameL
     }
 
     @Override
-    public void onLossGame(GDXGameLauncher gameLauncher, GDXGameLauncher.GameMode gameMode, int currentLevel, int breakPoint) {
-        displayAdsIfNeeded(gameMode, currentLevel);
+    public void onLossGame(GDXGameLauncher gameLauncher, GDXGameLauncher.GameMode gameMode, int currentLevel, int score) {
+        displayAdsIfNeeded(gameMode, currentLevel, score);
     }
 
-    private void displayAdsIfNeeded(GDXGameLauncher.GameMode gameMode, int currentLevel) {
+    private void displayAdsIfNeeded(GDXGameLauncher.GameMode gameMode, int currentLevel, int score) {
         if (!MainActivity.ADS_ENABLE)
             return;
-        if (gameMode != GDXGameLauncher.GameMode.UNLIMITED) {
-            lossClassicGameCounter++;
-            if (currentLevel > 5 && lossClassicGameCounter % 10 == 0) {
-                updateOnUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        interstitialAd.show();
-                    }
-                });
+        lossGameCounter++;
+        if (gameMode == GDXGameLauncher.GameMode.UNLIMITED) {
+            if (lossGameCounter % 5 == 0) {
+                displayAds();
             }
-        }else{
-
+        } else {
+            if (gameMode == GDXGameLauncher.GameMode.CLASSIC_SLOW) {
+                if (currentLevel >= 5 && lossGameCounter % 4 == 0) {
+                    displayAds();
+                }
+            } else if (gameMode == GDXGameLauncher.GameMode.CLASSIC_MEDIUM) {
+                if (currentLevel >= 3 && lossGameCounter % 6 == 0) {
+                    displayAds();
+                }
+            } else if (gameMode == GDXGameLauncher.GameMode.CLASSIC_FAST) {
+                if (lossGameCounter % 6 == 0) {
+                    displayAds();
+                }
+            } else if (gameMode == GDXGameLauncher.GameMode.CLASSIC_CRAZY) {
+                if (lossGameCounter % 8 == 0) {
+                    displayAds();
+                }
+            }
         }
+    }
+
+    private void displayAds() {
+        if (!MainActivity.ADS_ENABLE)
+            return;
+        updateOnUIThread(new Runnable() {
+            @Override
+            public void run() {
+                interstitialAd.show();
+            }
+        });
     }
 
     private void updateOnUIThread(Runnable runnable) {
