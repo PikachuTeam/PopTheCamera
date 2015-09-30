@@ -56,9 +56,10 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public static boolean touchable = true;
     private static boolean checkable = true;
 
-    private GameMode gameMode = GameMode.CLASSIC_MEDIUM;
+    private GameMode gameMode = GameMode.UNLIMITED;
     private OnGameListener onGameListener;
     private int unlimitedScore = 0;
+    private int unlimitedBestScore = 0;
 
     @Override
     public void create() {
@@ -320,6 +321,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             } else {
                 SoundHelper.enableSound = true;
                 soundButton.setImage("on_sound");
+                SoundHelper.getInstance().playSuccessSound();
             }
         } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
             if (VibrationHelper.enableVibration) {
@@ -328,6 +330,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             } else {
                 vibrationButton.setImage("on_vibrate");
                 VibrationHelper.enableVibration = true;
+                VibrationHelper.vibrate(1);
             }
         }
         return false;
@@ -503,8 +506,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     private void initTextView() {
         level = new TextView(Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri.fnt"), Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri.png"));
         index = new TextView(Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri_index.fnt"), Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri_index.png"));
-        level.setText("Level " + number);
-        index.setText("" + currentIndex);
+        updateTextView(1);
+        updateTextView(2);
 
         stage.addActor(level);
         stage.addActor(index);
@@ -536,14 +539,19 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         currentIndex = number;
         SoundHelper.enableSound = preferences.getBoolean("sound", true);
         VibrationHelper.enableVibration = preferences.getBoolean("vibration", true);
+        if(gameMode==GameMode.UNLIMITED){
+            unlimitedBestScore= preferences.getInteger("unlimited_best_score", 0);
+        }
     }
 
     private void saveData() {
         preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
-        preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
         preferences.putInteger("number", number);
         preferences.putBoolean("sound", SoundHelper.enableSound);
         preferences.putBoolean("vibration", VibrationHelper.enableVibration);
+        if(gameMode==GameMode.UNLIMITED){
+            preferences.putInteger("unlimited_best_score", unlimitedBestScore);
+        }
         preferences.flush();
     }
 
@@ -579,15 +587,33 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public void updateTextView(int type) {
         switch (type) {
             case 1:
-                level.setText("Level " + number);
-                if (number % 10 == 0) {
-                    level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
+                if(gameMode==GameMode.UNLIMITED){
+                    level.setText("My Best: " + unlimitedBestScore);
+                    if (unlimitedBestScore % 10 == 0) {
+                        level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
+                    }
+                }else{
+                    level.setText("Level: " + number);
+                    if (number % 10 == 0) {
+                        level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
+                    }
                 }
                 break;
             case 2:
-                index.setText("" + currentIndex);
-                if ((currentIndex + 1) % 10 == 0 || currentIndex == number) {
-                    index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
+                if(gameMode==GameMode.UNLIMITED){
+                    index.setText("" + unlimitedScore);
+                    if (unlimitedScore % 10 == 0){
+                        index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
+                    }
+                    if(unlimitedScore>=unlimitedBestScore){
+                        unlimitedBestScore = unlimitedScore;
+                        updateTextView(1);
+                    }
+                }else{
+                    index.setText("" + currentIndex);
+                    if ((currentIndex + 1) % 10 == 0 || currentIndex == number) {
+                        index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
+                    }
                 }
                 break;
         }
@@ -616,9 +642,10 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     private void increaseUnlimitedSeedIfNeeded(){
         if(gameMode==GameMode.UNLIMITED){
             unlimitedScore++;
+            updateTextView(2);
+//            Log.writeLog(unlimitedScore + " - >>>>>>>>>>>>>>>>>>> - ");
             if(unlimitedScore %GameMode.UNLIMITED_INCREASING_POINT==0){
                 indicator.setSpeed(gameMode.getUnlimitedNewSpeed());
-//                Log.writeLog(unlimitedScore + " - >>>>>>>>>>>>>>>>>>> - " + gameMode.getSpeed());
             }
         }
     }
