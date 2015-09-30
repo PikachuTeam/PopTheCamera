@@ -624,11 +624,11 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     }
 
     public static enum GameMode{
-        CLASSIC_SLOW(1.2f),
-        CLASSIC_MEDIUM(1.7f),
-        CLASSIC_FAST(2.2f),
-        CLASSIC_CRAZY(2.7f),
-        UNLIMITED(1.2f);//start from 1.2 and increase after each two level
+        CLASSIC_SLOW(1.0f),
+        CLASSIC_MEDIUM(1.6f),
+        CLASSIC_FAST(2.0f),
+        CLASSIC_CRAZY(2.4f),
+        UNLIMITED(1.0f);//start from 1.0 and increase after each two level
 
         public static final int UNLIMITED_INCREASING_POINT = 1;
         public static final float UNLIMITED_MAX_SPEED = 2.7f;
@@ -662,6 +662,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     }
 
     public static interface OnGameListener{
-        public void onLossGame(GDXGameLauncher gameLauncher, GameMode gameMode, int currentLevel, int breakPoint);
+        public void onLossGame(GDXGameLauncher gameLauncher, GameMode gameMode, int currentLevel, int score);
     }
 }
