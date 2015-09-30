@@ -23,7 +23,7 @@ public class GameFragment extends AndroidFragmentApplication implements GDXGameL
     public static final int GAME_MODE_CLASSIC_MEDIUM = 2;
     public static final int GAME_MODE_CLASSIC_FAST = 3;
     public static final int GAME_MODE_CLASSIC_CRAZY = 4;
-    public static final int GAME_MODE_CLASSIC_UNLIMITED = 10;
+    public static final int GAME_MODE_UNLIMITED = 10;
 
     private Handler handler;
 
@@ -54,7 +54,7 @@ public class GameFragment extends AndroidFragmentApplication implements GDXGameL
             case GAME_MODE_CLASSIC_CRAZY:
                 gameLauncher.setGameMode(GDXGameLauncher.GameMode.CLASSIC_CRAZY);
                 break;
-            case GAME_MODE_CLASSIC_UNLIMITED:
+            case GAME_MODE_UNLIMITED:
                 gameLauncher.setGameMode(GDXGameLauncher.GameMode.UNLIMITED);
                 break;
         }
