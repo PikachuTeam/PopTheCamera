@@ -24,7 +24,7 @@ public class ColorHelper {
     private ColorHelper() {
     }
 
-    public void initColor() {
+    public void initColor(int index) {
 
         Json json = new Json();
         ColorFactory colorFactory = json.fromJson(ColorFactory.class,
@@ -40,7 +40,7 @@ public class ColorHelper {
             darkestColor[i] = new Color(Color.valueOf(colorFactory.colors.get(i).len4));
         }
         length = brightestColor.length;
-        index = 0;
+        this.index = index;
     }
 
     public static ColorHelper getInstance() {

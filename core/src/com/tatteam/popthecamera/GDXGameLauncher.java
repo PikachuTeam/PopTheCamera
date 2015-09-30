@@ -56,7 +56,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public static boolean touchable = true;
     private static boolean checkable = true;
 
-    private Constants.GameMode gameMode = Constants.GameMode.UNLIMITED;
+    private Constants.GameMode gameMode = Constants.GameMode.CLASSIC_SLOW;
     private OnGameListener onGameListener;
     private int unlimitedScore = 0;
     private int unlimitedBestScore = 0;
@@ -86,8 +86,12 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         atlas = new TextureAtlas(Gdx.files.internal(AssetsLoader.getInstance().getImagePath() + "pop_the_camera.pack"));
 
-        ColorHelper.getInstance().initColor();
-        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(0);
+        if (gameMode == Constants.GameMode.UNLIMITED) {
+            ColorHelper.getInstance().initColor(0);
+        } else {
+            ColorHelper.getInstance().initColor(classicLevel - 1);
+        }
+        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex());
 
         init();
 
@@ -153,7 +157,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         cameraGroup.setPosition(fitViewport.getWorldWidth() / 2 - cameraGroup.getWidth() / 2, fitViewport.getWorldHeight() / 2 - cameraGroup.getHeight() / 2);
         cameraGroup.setOrigin(cameraGroup.getWidth() / 2, cameraGroup.getHeight() / 2);
 
-        cameraButton.setPosition(cameraButton.getWidth(), cameraGroup.getHeight() - cameraButton.getHeight() * 3.85f);
+        cameraButton.setPosition(cameraButton.getWidth(), cameraGroup.getHeight() - cameraButton.getHeight() * 4f);
 
         initLens();
         lensGroup.setPosition(cameraGroup.getWidth() / 2 - lensGroup.getWidth() / 2, cameraGroup.getHeight() / 2 - lensGroup.getHeight() / 2 - (lens1.getHeight() / 2 - lens2.getHeight() / 2) / 3);
@@ -262,10 +266,18 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                             delta = -indicationRotation + dot.getRotation();
                         }
                     } else {
-                        if (indicationRotation >= dot.getRotation()) {
-                            delta = 360 - indicationRotation + dot.getRotation();
+                        if (indicationRotation <= 90 || indicationRotation >= 270) {
+                            if (indicationRotation >= dot.getRotation()) {
+                                delta = 360 - indicationRotation + dot.getRotation();
+                            } else {
+                                delta = 360 - dot.getRotation() + indicationRotation;
+                            }
                         } else {
-                            delta = 360 - dot.getRotation() + indicationRotation;
+                            if (indicationRotation >= dot.getRotation()) {
+                                delta = indicationRotation - dot.getRotation();
+                            } else {
+                                delta = -indicationRotation + dot.getRotation();
+                            }
                         }
                     }
                     delta -= e;
@@ -280,7 +292,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
                         Log.writeLog("Ting ting.");
                         SoundHelper.getInstance().playSuccessSound();
-                        if (classicScore != 0 || gameMode ==  Constants.GameMode.UNLIMITED) {
+                        if (classicScore != 0 || gameMode == Constants.GameMode.UNLIMITED) {
                             increaseUnlimitedSeedIfNeeded();
                             currentOrientation = indicator.clockwise;
                             dot.fadeOut(2);
@@ -373,7 +385,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 if (this.onGameListener != null) {
                     onGameListener.onLossGame(this, gameMode, classicLevel, classicScore);
                 }
-//                saveData();
                 resetScoreAtUnlimitedModeIfNeeded();
                 break;
         }
@@ -400,15 +411,24 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         delta = -indicationRotation + dot.getRotation();
                     }
                 } else {
-                    if (indicationRotation >= dot.getRotation()) {
-                        delta = 360 - indicationRotation + dot.getRotation();
+                    if (indicationRotation <= 90 || indicationRotation >= 270) {
+                        if (indicationRotation >= dot.getRotation()) {
+                            delta = 360 - indicationRotation + dot.getRotation();
+                        } else {
+                            delta = 360 - dot.getRotation() + indicationRotation;
+                        }
                     } else {
-                        delta = 360 - dot.getRotation() + indicationRotation;
+                        if (indicationRotation >= dot.getRotation()) {
+                            delta = indicationRotation - dot.getRotation();
+                        } else {
+                            delta = -indicationRotation + dot.getRotation();
+                        }
                     }
                 }
                 delta -= e;
                 if (indicator.clockwise) {
                     if (isSameSide(indicationRotation, dot.getRotation())) {
+                        Log.writeLog("Aloha1");
                         if (indicationRotation < dot.getRotation()) {
                             if (delta > dotBeta / 2) {
                                 Log.writeLog("Check over 1");
@@ -422,21 +442,38 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                             }
                         }
                     } else {
-                        if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
-                            if (delta > dotBeta / 2) {
-                                Log.writeLog("Check over 2");
-                                Log.writeLog("Indicator Rotation", "" + indicationRotation);
-                                Log.writeLog("Dot Rotation", "" + dot.getRotation());
-                                Log.writeLog("Delta 2", "" + delta);
-                                Log.writeLog("Dot beta", "" + dotBeta / 2);
-                                Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
-                                Log.writeLog("Tach.");
-                                stopGame(2);
+                        Log.writeLog("Aloha2");
+                        if (dot.getRotation() >= 180 && dot.getRotation() <= 270) {
+                            if (indicationRotation <= dot.getRotation()) {
+                                if (delta > dotBeta / 2) {
+                                    Log.writeLog("Check over 2");
+                                    Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                    Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                    Log.writeLog("Delta 2", "" + delta);
+                                    Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                    Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                    Log.writeLog("Tach.");
+                                    stopGame(2);
+                                }
+                            }
+                        } else if (dot.getRotation() >= 0 && dot.getRotation() <= 90) {
+                            if (indicationRotation >= dot.getRotation()) {
+                                if (delta > dotBeta / 2) {
+                                    Log.writeLog("Check over 4");
+                                    Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                    Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                    Log.writeLog("Delta 2", "" + delta);
+                                    Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                    Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                    Log.writeLog("Tach.");
+                                    stopGame(2);
+                                }
                             }
                         }
                     }
                 } else {
                     if (isSameSide(indicationRotation, dot.getRotation())) {
+                        Log.writeLog("Aloha3");
                         if (indicationRotation > dot.getRotation()) {
                             if (delta > dotBeta / 2) {
                                 Log.writeLog("Check over 3");
@@ -450,16 +487,32 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                             }
                         }
                     } else {
-                        if (dot.getRotation() >= 180 && dot.getRotation() <= 360) {
-                            if (delta > dotBeta / 2) {
-                                Log.writeLog("Check over 4");
-                                Log.writeLog("Indicator Rotation", "" + indicationRotation);
-                                Log.writeLog("Dot Rotation", "" + dot.getRotation());
-                                Log.writeLog("Delta 2", "" + delta);
-                                Log.writeLog("Dot beta", "" + dotBeta / 2);
-                                Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
-                                Log.writeLog("Tach.");
-                                stopGame(2);
+                        Log.writeLog("Aloha4");
+                        if (dot.getRotation() >= 270 && dot.getRotation() < 360) {
+                            if (indicationRotation <= dot.getRotation()) {
+                                if (delta > dotBeta / 2) {
+                                    Log.writeLog("Check over 4");
+                                    Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                    Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                    Log.writeLog("Delta 2", "" + delta);
+                                    Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                    Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                    Log.writeLog("Tach.");
+                                    stopGame(2);
+                                }
+                            }
+                        } else if (dot.getRotation() >= 90 && dot.getRotation() < 180) {
+                            if (indicationRotation >= dot.getRotation()) {
+                                if (delta > dotBeta / 2) {
+                                    Log.writeLog("Check over 4");
+                                    Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                    Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                    Log.writeLog("Delta 2", "" + delta);
+                                    Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                    Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                    Log.writeLog("Tach.");
+                                    stopGame(2);
+                                }
                             }
                         }
                     }
@@ -539,16 +592,16 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         SoundHelper.enableSound = preferences.getBoolean("sound", true);
         VibrationHelper.enableVibration = preferences.getBoolean("vibration", true);
-        if(gameMode== Constants.GameMode.UNLIMITED){
-            unlimitedBestScore= preferences.getInteger("unlimited_best_score", 0);
-        }else{
-            if(gameMode == Constants.GameMode.CLASSIC_SLOW){
+        if (gameMode == Constants.GameMode.UNLIMITED) {
+            unlimitedBestScore = preferences.getInteger("unlimited_best_score", 0);
+        } else {
+            if (gameMode == Constants.GameMode.CLASSIC_SLOW) {
                 classicLevel = preferences.getInteger("classic_slow", 1);
-            }else if(gameMode == Constants.GameMode.CLASSIC_MEDIUM){
+            } else if (gameMode == Constants.GameMode.CLASSIC_MEDIUM) {
                 classicLevel = preferences.getInteger("classic_medium", 1);
-            }else if(gameMode == Constants.GameMode.CLASSIC_FAST){
+            } else if (gameMode == Constants.GameMode.CLASSIC_FAST) {
                 classicLevel = preferences.getInteger("classic_fast", 1);
-            }else if(gameMode == Constants.GameMode.CLASSIC_CRAZY){
+            } else if (gameMode == Constants.GameMode.CLASSIC_CRAZY) {
                 classicLevel = preferences.getInteger("classic_crazy", 1);
             }
             classicScore = classicLevel;
@@ -559,16 +612,16 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
         preferences.putBoolean("sound", SoundHelper.enableSound);
         preferences.putBoolean("vibration", VibrationHelper.enableVibration);
-        if(gameMode== Constants.GameMode.UNLIMITED){
+        if (gameMode == Constants.GameMode.UNLIMITED) {
             preferences.putInteger("unlimited_best_score", unlimitedBestScore);
-        }else{
-            if(gameMode == Constants.GameMode.CLASSIC_SLOW){
+        } else {
+            if (gameMode == Constants.GameMode.CLASSIC_SLOW) {
                 preferences.putInteger("classic_slow", classicLevel);
-            }else if(gameMode == Constants.GameMode.CLASSIC_MEDIUM){
+            } else if (gameMode == Constants.GameMode.CLASSIC_MEDIUM) {
                 preferences.putInteger("classic_medium", classicLevel);
-            }else if(gameMode == Constants.GameMode.CLASSIC_FAST){
+            } else if (gameMode == Constants.GameMode.CLASSIC_FAST) {
                 preferences.putInteger("classic_fast", classicLevel);
-            }else if(gameMode == Constants.GameMode.CLASSIC_CRAZY){
+            } else if (gameMode == Constants.GameMode.CLASSIC_CRAZY) {
                 preferences.putInteger("classic_crazy", classicLevel);
             }
         }
@@ -607,12 +660,12 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public void updateTextView(int type) {
         switch (type) {
             case 1:
-                if(gameMode== Constants.GameMode.UNLIMITED){
+                if (gameMode == Constants.GameMode.UNLIMITED) {
                     level.setText("My Best: " + unlimitedBestScore);
                     if (unlimitedBestScore % 10 == 0) {
                         level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
                     }
-                }else{
+                } else {
                     level.setText("Level: " + classicLevel);
                     if (classicLevel % 10 == 0) {
                         level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
@@ -620,16 +673,16 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 }
                 break;
             case 2:
-                if(gameMode== Constants.GameMode.UNLIMITED){
+                if (gameMode == Constants.GameMode.UNLIMITED) {
                     index.setText("" + unlimitedScore);
-                    if (unlimitedScore % 10 == 0){
+                    if (unlimitedScore % 10 == 0) {
                         index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
                     }
-                    if(unlimitedScore>=unlimitedBestScore){
+                    if (unlimitedScore >= unlimitedBestScore) {
                         unlimitedBestScore = unlimitedScore;
                         updateTextView(1);
                     }
-                }else{
+                } else {
                     index.setText("" + classicScore);
                     if ((classicScore + 1) % 10 == 0 || classicScore == classicLevel) {
                         index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
@@ -651,26 +704,25 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         return gameMode;
     }
 
-    private void resetScoreAtUnlimitedModeIfNeeded(){
-        if (gameMode ==  Constants.GameMode.UNLIMITED) {
+    private void resetScoreAtUnlimitedModeIfNeeded() {
+        if (gameMode == Constants.GameMode.UNLIMITED) {
             unlimitedScore = 0;
             gameMode.resetUnlimitedSpeed();
         }
     }
 
-    private void increaseUnlimitedSeedIfNeeded(){
-        if(gameMode== Constants.GameMode.UNLIMITED){
+    private void increaseUnlimitedSeedIfNeeded() {
+        if (gameMode == Constants.GameMode.UNLIMITED) {
             unlimitedScore++;
             updateTextView(2);
-            if(unlimitedScore % Constants.GameMode.UNLIMITED_INCREASING_POINT==0){
+            if (unlimitedScore % Constants.GameMode.UNLIMITED_INCREASING_POINT == 0) {
                 indicator.setSpeed(gameMode.getUnlimitedNewSpeed());
             }
         }
     }
 
 
-
-    public static interface OnGameListener{
-        public void onLossGame(GDXGameLauncher gameLauncher,  Constants.GameMode gameMode, int currentLevel, int score);
+    public static interface OnGameListener {
+        public void onLossGame(GDXGameLauncher gameLauncher, Constants.GameMode gameMode, int currentLevel, int score);
     }
 }
