@@ -153,7 +153,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         cameraGroup.setPosition(fitViewport.getWorldWidth() / 2 - cameraGroup.getWidth() / 2, fitViewport.getWorldHeight() / 2 - cameraGroup.getHeight() / 2);
         cameraGroup.setOrigin(cameraGroup.getWidth() / 2, cameraGroup.getHeight() / 2);
 
-        cameraButton.setPosition(cameraButton.getWidth(), cameraGroup.getHeight() - cameraButton.getHeight() * 3.85f);
+        cameraButton.setPosition(cameraButton.getWidth(), cameraGroup.getHeight() - cameraButton.getHeight() * 4f);
 
         initLens();
         lensGroup.setPosition(cameraGroup.getWidth() / 2 - lensGroup.getWidth() / 2, cameraGroup.getHeight() / 2 - lensGroup.getHeight() / 2 - (lens1.getHeight() / 2 - lens2.getHeight() / 2) / 3);
@@ -262,10 +262,18 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                             delta = -indicationRotation + dot.getRotation();
                         }
                     } else {
-                        if (indicationRotation >= dot.getRotation()) {
-                            delta = 360 - indicationRotation + dot.getRotation();
+                        if (indicationRotation <= 90 || indicationRotation >= 270) {
+                            if (indicationRotation >= dot.getRotation()) {
+                                delta = 360 - indicationRotation + dot.getRotation();
+                            } else {
+                                delta = 360 - dot.getRotation() + indicationRotation;
+                            }
                         } else {
-                            delta = 360 - dot.getRotation() + indicationRotation;
+                            if (indicationRotation >= dot.getRotation()) {
+                                delta = indicationRotation - dot.getRotation();
+                            } else {
+                                delta = -indicationRotation + dot.getRotation();
+                            }
                         }
                     }
                     delta -= e;
@@ -400,15 +408,24 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         delta = -indicationRotation + dot.getRotation();
                     }
                 } else {
-                    if (indicationRotation >= dot.getRotation()) {
-                        delta = 360 - indicationRotation + dot.getRotation();
+                    if (indicationRotation <= 90 || indicationRotation >= 270) {
+                        if (indicationRotation >= dot.getRotation()) {
+                            delta = 360 - indicationRotation + dot.getRotation();
+                        } else {
+                            delta = 360 - dot.getRotation() + indicationRotation;
+                        }
                     } else {
-                        delta = 360 - dot.getRotation() + indicationRotation;
+                        if (indicationRotation >= dot.getRotation()) {
+                            delta = indicationRotation - dot.getRotation();
+                        } else {
+                            delta = -indicationRotation + dot.getRotation();
+                        }
                     }
                 }
                 delta -= e;
                 if (indicator.clockwise) {
                     if (isSameSide(indicationRotation, dot.getRotation())) {
+                        Log.writeLog("Aloha1");
                         if (indicationRotation < dot.getRotation()) {
                             if (delta > dotBeta / 2) {
                                 Log.writeLog("Check over 1");
@@ -422,21 +439,38 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                             }
                         }
                     } else {
-                        if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
-                            if (delta > dotBeta / 2) {
-                                Log.writeLog("Check over 2");
-                                Log.writeLog("Indicator Rotation", "" + indicationRotation);
-                                Log.writeLog("Dot Rotation", "" + dot.getRotation());
-                                Log.writeLog("Delta 2", "" + delta);
-                                Log.writeLog("Dot beta", "" + dotBeta / 2);
-                                Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
-                                Log.writeLog("Tach.");
-                                stopGame(2);
+                        Log.writeLog("Aloha2");
+                        if (dot.getRotation() >= 180 && dot.getRotation() <= 270) {
+                            if (indicationRotation <= dot.getRotation()) {
+                                if (delta > dotBeta / 2) {
+                                    Log.writeLog("Check over 2");
+                                    Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                    Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                    Log.writeLog("Delta 2", "" + delta);
+                                    Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                    Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                    Log.writeLog("Tach.");
+                                    stopGame(2);
+                                }
+                            }
+                        } else if (dot.getRotation() >= 0 && dot.getRotation() <= 90) {
+                            if (indicationRotation >= dot.getRotation()) {
+                                if (delta > dotBeta / 2) {
+                                    Log.writeLog("Check over 4");
+                                    Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                    Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                    Log.writeLog("Delta 2", "" + delta);
+                                    Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                    Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                    Log.writeLog("Tach.");
+                                    stopGame(2);
+                                }
                             }
                         }
                     }
                 } else {
                     if (isSameSide(indicationRotation, dot.getRotation())) {
+                        Log.writeLog("Aloha3");
                         if (indicationRotation > dot.getRotation()) {
                             if (delta > dotBeta / 2) {
                                 Log.writeLog("Check over 3");
@@ -450,16 +484,32 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                             }
                         }
                     } else {
-                        if (dot.getRotation() >= 180 && dot.getRotation() <= 360) {
-                            if (delta > dotBeta / 2) {
-                                Log.writeLog("Check over 4");
-                                Log.writeLog("Indicator Rotation", "" + indicationRotation);
-                                Log.writeLog("Dot Rotation", "" + dot.getRotation());
-                                Log.writeLog("Delta 2", "" + delta);
-                                Log.writeLog("Dot beta", "" + dotBeta / 2);
-                                Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
-                                Log.writeLog("Tach.");
-                                stopGame(2);
+                        Log.writeLog("Aloha4");
+                        if (dot.getRotation() >= 270 && dot.getRotation() < 360) {
+                            if (indicationRotation <= dot.getRotation()) {
+                                if (delta > dotBeta / 2) {
+                                    Log.writeLog("Check over 4");
+                                    Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                    Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                    Log.writeLog("Delta 2", "" + delta);
+                                    Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                    Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                    Log.writeLog("Tach.");
+                                    stopGame(2);
+                                }
+                            }
+                        } else if (dot.getRotation() >= 90 && dot.getRotation() < 180) {
+                            if (indicationRotation >= dot.getRotation()) {
+                                if (delta > dotBeta / 2) {
+                                    Log.writeLog("Check over 4");
+                                    Log.writeLog("Indicator Rotation", "" + indicationRotation);
+                                    Log.writeLog("Dot Rotation", "" + dot.getRotation());
+                                    Log.writeLog("Delta 2", "" + delta);
+                                    Log.writeLog("Dot beta", "" + dotBeta / 2);
+                                    Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
+                                    Log.writeLog("Tach.");
+                                    stopGame(2);
+                                }
                             }
                         }
                     }
