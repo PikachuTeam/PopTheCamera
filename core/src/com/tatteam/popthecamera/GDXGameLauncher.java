@@ -86,7 +86,11 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         atlas = new TextureAtlas(Gdx.files.internal(AssetsLoader.getInstance().getImagePath() + "pop_the_camera.pack"));
 
-        ColorHelper.getInstance().initColor(classicLevel-1);
+        if (gameMode == Constants.GameMode.UNLIMITED) {
+            ColorHelper.getInstance().initColor(0);
+        } else {
+            ColorHelper.getInstance().initColor(classicLevel - 1);
+        }
         currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex());
 
         init();
