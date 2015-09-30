@@ -1,9 +1,95 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#cc5759">
+    android:background="#006064">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/margin_menu2"
+            android:text="Pop The Camera"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/game_name_text_size"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="@dimen/width_button"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/margin_level"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="100">
+
+            <RelativeLayout
+                android:id="@+id/btnPreMode"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/next_button_size2"
+                android:layout_weight="25">
+
+                <ImageView
+                    android:layout_width="@dimen/next_button_size"
+                    android:layout_height="@dimen/next_button_size"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/pre" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/tvLevel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="50"
+                android:gravity="center"
+                android:text="Medium"
+                android:textSize="@dimen/mode_game_text_size"
+                android:textStyle="italic" />
+
+            <RelativeLayout
+                android:id="@+id/btnNextMode"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/next_button_size"
+                android:layout_weight="25">
+
+                <ImageView
+                    android:layout_width="@dimen/next_button_size"
+                    android:layout_height="@dimen/next_button_size"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/next" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_classical_mode"
+            android:layout_width="@dimen/width_button"
+            android:layout_height="@dimen/height_button"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Classic"
+            android:textColor="#004d50"
+            android:textSize="@dimen/mode_game_text_size2"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_unlimited_mode"
+            android:layout_width="@dimen/width_button"
+            android:layout_height="@dimen/height_button"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/margin_unlimited"
+            android:gravity="center"
+            android:text="Unlimited"
+            android:textColor="#004d50"
+            android:textSize="@dimen/mode_game_text_size2"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/layout_ads"
@@ -17,25 +103,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:visibility="gone"
             ads:adSize="SMART_BANNER"
             ads:adUnitId="@string/small_banner_ad_unit_id" />
     </RelativeLayout>
-
-    <Button
-        android:id="@+id/btn_classical_mode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="Classic"
-        android:layout_marginTop="30dp"/>
-
-    <Button
-        android:id="@+id/btn_unlimited_mode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="Unlimited" />
 </RelativeLayout>
