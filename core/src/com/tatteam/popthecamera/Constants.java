@@ -17,6 +17,41 @@ public class Constants {
     public final static float CAMERA_BUTTON_PRESS_DURATION = 0.4f;
     public final static float CAMERA_BUTTON_RELEASE_DURATION = 0.25f;
 
-//    public final static float DOT_ROTATION_SPEED = 1.85f;
+    public static enum GameMode {
+        CLASSIC_SLOW(1.0f),
+        CLASSIC_MEDIUM(1.6f),
+        CLASSIC_FAST(2.0f),
+        CLASSIC_CRAZY(2.4f),
+        UNLIMITED(1.0f);//start from 1.0 and increase after each two level
 
+        public static final int UNLIMITED_INCREASING_POINT = 1;
+        public static final float UNLIMITED_MAX_SPEED = 2.7f;
+
+        private float speed;
+        private float increasingSpeed = 0.01f;
+
+        private GameMode(float speed) {
+            this.speed = speed;
+        }
+
+        public float getSpeed() {
+            return speed;
+        }
+
+        public float getUnlimitedNewSpeed() {
+            if (this == UNLIMITED) {
+                if (speed < UNLIMITED_MAX_SPEED) {
+                    speed += increasingSpeed;
+                }
+                return speed;
+            }
+            return 0;
+        }
+
+        public void resetUnlimitedSpeed() {
+            if (this == UNLIMITED) {
+                this.speed = 1.2f;
+            }
+        }
+    }
 }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.tatteam.popthecamera.Constants;
 import com.tatteam.popthecamera.GDXGameLauncher;
 
 /**
@@ -43,51 +44,51 @@ public class GameFragment extends AndroidFragmentApplication implements GDXGameL
         int gameMode = bundle.getInt(KEY_GAME_MODE, GAME_MODE_CLASSIC_MEDIUM);
         switch (gameMode) {
             case GAME_MODE_CLASSIC_SLOW:
-                gameLauncher.setGameMode(GDXGameLauncher.GameMode.CLASSIC_SLOW);
+                gameLauncher.setGameMode(Constants.GameMode.CLASSIC_SLOW);
                 break;
             case GAME_MODE_CLASSIC_MEDIUM:
-                gameLauncher.setGameMode(GDXGameLauncher.GameMode.CLASSIC_MEDIUM);
+                gameLauncher.setGameMode(Constants.GameMode.CLASSIC_MEDIUM);
                 break;
             case GAME_MODE_CLASSIC_FAST:
-                gameLauncher.setGameMode(GDXGameLauncher.GameMode.CLASSIC_FAST);
+                gameLauncher.setGameMode(Constants.GameMode.CLASSIC_FAST);
                 break;
             case GAME_MODE_CLASSIC_CRAZY:
-                gameLauncher.setGameMode(GDXGameLauncher.GameMode.CLASSIC_CRAZY);
+                gameLauncher.setGameMode(Constants.GameMode.CLASSIC_CRAZY);
                 break;
             case GAME_MODE_UNLIMITED:
-                gameLauncher.setGameMode(GDXGameLauncher.GameMode.UNLIMITED);
+                gameLauncher.setGameMode(Constants.GameMode.UNLIMITED);
                 break;
         }
         return initializeForView(gameLauncher, config);
     }
 
     @Override
-    public void onLossGame(GDXGameLauncher gameLauncher, GDXGameLauncher.GameMode gameMode, int currentLevel, int score) {
+    public void onLossGame(GDXGameLauncher gameLauncher, Constants.GameMode gameMode, int currentLevel, int score) {
         displayAdsIfNeeded(gameMode, currentLevel, score);
     }
 
-    private void displayAdsIfNeeded(GDXGameLauncher.GameMode gameMode, int currentLevel, int score) {
+    private void displayAdsIfNeeded(Constants.GameMode gameMode, int currentLevel, int score) {
         if (!MainActivity.ADS_ENABLE)
             return;
         lossGameCounter++;
-        if (gameMode == GDXGameLauncher.GameMode.UNLIMITED) {
+        if (gameMode == Constants.GameMode.UNLIMITED) {
             if (lossGameCounter % 5 == 0) {
                 displayAds();
             }
         } else {
-            if (gameMode == GDXGameLauncher.GameMode.CLASSIC_SLOW) {
+            if (gameMode == Constants.GameMode.CLASSIC_SLOW) {
                 if (currentLevel >= 5 && lossGameCounter % 4 == 0) {
                     displayAds();
                 }
-            } else if (gameMode == GDXGameLauncher.GameMode.CLASSIC_MEDIUM) {
+            } else if (gameMode == Constants.GameMode.CLASSIC_MEDIUM) {
                 if (currentLevel >= 3 && lossGameCounter % 6 == 0) {
                     displayAds();
                 }
-            } else if (gameMode == GDXGameLauncher.GameMode.CLASSIC_FAST) {
+            } else if (gameMode == Constants.GameMode.CLASSIC_FAST) {
                 if (lossGameCounter % 6 == 0) {
                     displayAds();
                 }
-            } else if (gameMode == GDXGameLauncher.GameMode.CLASSIC_CRAZY) {
+            } else if (gameMode == Constants.GameMode.CLASSIC_CRAZY) {
                 if (lossGameCounter % 8 == 0) {
                     displayAds();
                 }
