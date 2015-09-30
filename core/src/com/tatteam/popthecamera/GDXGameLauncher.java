@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tatteam.popthecamera.actors.AlphaRectangle;
 import com.tatteam.popthecamera.actors.Background;
+import com.tatteam.popthecamera.actors.Camera;
 import com.tatteam.popthecamera.actors.CameraButton;
 import com.tatteam.popthecamera.actors.Dot;
 import com.tatteam.popthecamera.actors.Indicator;
@@ -22,13 +23,15 @@ import com.tatteam.popthecamera.actors.TextView;
 
 public class GDXGameLauncher extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener, Dot.OnFadeCompleteListener {
 
+    private Viewport backgroundViewport;
     private Viewport fitViewport;
     private Viewport screenViewport;
     private Indicator indicator;
     private Dot dot;
-    private Background background;
+    private Camera camera;
     private Stage stage;
     private Stage splashStage;
+    private Stage backgroundStage;
     private TextureAtlas atlas;
     private ActorGroup cameraGroup;
     private ActorGroup lensGroup;
@@ -56,10 +59,12 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public static boolean touchable = true;
     private static boolean checkable = true;
 
-    private Constants.GameMode gameMode = Constants.GameMode.CLASSIC_SLOW;
+    private Constants.GameMode gameMode = Constants.GameMode.CLASSIC_MEDIUM;
     private OnGameListener onGameListener;
     private int unlimitedScore = 0;
     private int unlimitedBestScore = 0;
+
+    private Background background;
 
     @Override
     public void create() {
@@ -72,6 +77,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         stage = new Stage();
         splashStage = new Stage();
+        backgroundStage = new Stage();
 
         fitViewport = new FitViewport(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight());
         fitViewport.update(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), true);
@@ -81,17 +87,25 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         screenViewport.update(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), true);
         splashStage.setViewport(screenViewport);
 
+        backgroundViewport= new ScreenViewport();
+        backgroundViewport.update(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), true);
+        backgroundStage.setViewport(backgroundViewport);
+
         rectangle = new AlphaRectangle();
         rectangle.setOnDisappearListener(this);
+
 
         atlas = new TextureAtlas(Gdx.files.internal(AssetsLoader.getInstance().getImagePath() + "pop_the_camera.pack"));
 
         if (gameMode == Constants.GameMode.UNLIMITED) {
-            ColorHelper.getInstance().initColor(0);
+            ColorHelper.getInstance().initColor();
+            currentBackgroundColor = ColorHelper.getInstance().getBackGroundColorUnlimitedMode(unlimitedScore);
         } else {
-            ColorHelper.getInstance().initColor(classicLevel - 1);
+            ColorHelper.getInstance().initColor();
+            currentBackgroundColor = ColorHelper.getInstance().getBackgroundColor(classicLevel);
         }
-        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex());
+        background = new Background(screenViewport.getWorldWidth(),screenViewport.getWorldHeight());
+        backgroundStage.addActor(background);
 
         init();
 
@@ -114,10 +128,16 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
     @Override
     public void render() {
-        Gdx.gl.glClearColor(currentBackgroundColor.r, currentBackgroundColor.g, currentBackgroundColor.b, currentBackgroundColor.a);
+//        Gdx.gl.glClearColor(currentBackgroundColor.r, currentBackgroundColor.g, currentBackgroundColor.b, currentBackgroundColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         checkOver();
+
+        backgroundViewport.apply();
+        background.setSize(screenViewport.getWorldWidth(), screenViewport.getWorldHeight());
+        background.setColor(currentBackgroundColor);
+        backgroundStage.act();
+        backgroundStage.draw();
 
         fitViewport.apply();
         stage.act();
@@ -143,17 +163,19 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public void resize(int width, int height) {
         fitViewport.update(width, height, true);
         screenViewport.update(width, height, true);
+        backgroundViewport.update(width, height, true);
+        background.setSize(screenViewport.getWorldWidth(), screenViewport.getWorldHeight());
     }
 
     private void init() {
         // Set up camera group. Camera group includes camera_button, background, lensGroup.
         cameraGroup = new ActorGroup();
 
-        background = new Background(atlas.findRegion("camera"));
+        camera = new Camera(atlas.findRegion("camera"));
         cameraButton = new CameraButton(atlas.findRegion("camera_button"));
         cameraButton.setOnPressFinishListener(this);
 
-        cameraGroup.setSize(background.getWidth(), background.getHeight());
+        cameraGroup.setSize(camera.getWidth(), camera.getHeight());
         cameraGroup.setPosition(fitViewport.getWorldWidth() / 2 - cameraGroup.getWidth() / 2, fitViewport.getWorldHeight() / 2 - cameraGroup.getHeight() / 2);
         cameraGroup.setOrigin(cameraGroup.getWidth() / 2, cameraGroup.getHeight() / 2);
 
@@ -163,7 +185,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         lensGroup.setPosition(cameraGroup.getWidth() / 2 - lensGroup.getWidth() / 2, cameraGroup.getHeight() / 2 - lensGroup.getHeight() / 2 - (lens1.getHeight() / 2 - lens2.getHeight() / 2) / 3);
 
         cameraGroup.addActor(cameraButton);
-        cameraGroup.addActor(background);
+        cameraGroup.addActor(camera);
         cameraGroup.addActor(lensGroup.getActors());
         cameraGroup.setOnShakeCompleteListener(this);
 
@@ -205,7 +227,11 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         dotBeta = Math.toDegrees(Math.acos((2 * dotRadius * dotRadius - dot.getWidth() * dot.getWidth()) / (2 * dotRadius * dotRadius)));
 
         // set color
-        ColorHelper.getInstance().setColor(lens2, lens3, lens4);
+        if (gameMode == Constants.GameMode.UNLIMITED) {
+            ColorHelper.getInstance().setColor(1, lens2, lens3, lens4);
+        } else {
+            ColorHelper.getInstance().setColor(classicLevel, lens2, lens3, lens4);
+        }
 
         lensGroup.addActor(lens1);
         lensGroup.addActor(lens2);
@@ -302,6 +328,10 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                                 indicator.clockwise = true;
                             }
                             checkable = false;
+
+                            if (gameMode == Constants.GameMode.UNLIMITED && unlimitedScore % 1 == 0) {
+                                ColorHelper.getInstance().setColorUnlimitedMode(unlimitedScore,background ,lens2, lens3, lens4);
+                            }
                         } else {
                             stopGame(1);
                         }
@@ -539,11 +569,13 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     @Override
     public void onPressFinish() {
         SoundHelper.getInstance().playFinishLevelSound();
-        Color color = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex() - 1);
-        rectangle.setColor(color.r, color.g, color.b, color.a * 0.5f);
-        rectangle.appear(splashStage);
-        indicator.fadeOut();
-        dot.fadeOut(1);
+        if (gameMode != Constants.GameMode.UNLIMITED) {
+            Color color = ColorHelper.getInstance().getBackgroundColor(classicLevel);
+            rectangle.setColor(color.r, color.g, color.b, color.a * 0.5f);
+            rectangle.appear(splashStage);
+            indicator.fadeOut();
+            dot.fadeOut(1);
+        }
     }
 
     @Override
@@ -553,8 +585,10 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         updateTextView(1);
         updateTextView(2);
         playAgain = false;
-        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex());
-        ColorHelper.getInstance().setColor(lens2, lens3, lens4);
+        if (gameMode != Constants.GameMode.UNLIMITED) {
+            currentBackgroundColor = ColorHelper.getInstance().getBackgroundColor(classicLevel);
+            ColorHelper.getInstance().setColor(classicLevel, lens2, lens3, lens4);
+        }
     }
 
     private void initTextView() {
@@ -646,7 +680,11 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         if (type == 1) {
             indicator.setRotation(0);
             playAgain = false;
-            currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex() - 1);
+            if (gameMode == Constants.GameMode.UNLIMITED) {
+                currentBackgroundColor = ColorHelper.getInstance().getBackGroundColorUnlimitedMode(0);
+            } else {
+                currentBackgroundColor = ColorHelper.getInstance().getBackgroundColor(classicLevel);
+            }
             if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
                 indicator.clockwise = false;
             } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {

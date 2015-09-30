@@ -3,6 +3,7 @@ package com.tatteam.popthecamera;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.ColorAction;
 import com.badlogic.gdx.utils.Json;
 
 import java.util.ArrayList;
@@ -12,19 +13,21 @@ import java.util.ArrayList;
  */
 public class ColorHelper {
 
+    private static final float COLOR_TRANSFORM_DURATION = 0.5f;
+
     private static ColorHelper instance;
     private Color[] brightestColor;
     private Color[] normalColor;
     private Color[] darkestColor;
-    private int index;
-    private int length;
     public final static Color FAIL_COLOR = new Color(0xff2d2dff);
     public final static Color FLASH_COLOR = new Color(0.93f, 0.93f, 0.93f, 0.37f);
+    private MyColorAction colorLen2Action, colorLen3Action, colorLen4Action, colorBackgroundAction;
 
     private ColorHelper() {
+
     }
 
-    public void initColor(int index) {
+    public void initColor() {
 
         Json json = new Json();
         ColorFactory colorFactory = json.fromJson(ColorFactory.class,
@@ -39,8 +42,11 @@ public class ColorHelper {
             normalColor[i] = new Color(Color.valueOf(colorFactory.colors.get(i).len3));
             darkestColor[i] = new Color(Color.valueOf(colorFactory.colors.get(i).len4));
         }
-        length = brightestColor.length;
-        this.index = index;
+
+        colorLen2Action = new MyColorAction();
+        colorLen3Action = new MyColorAction();
+        colorLen4Action = new MyColorAction();
+        colorBackgroundAction= new MyColorAction();
     }
 
     public static ColorHelper getInstance() {
@@ -50,42 +56,36 @@ public class ColorHelper {
         return instance;
     }
 
-    public Color getBrightestColor(int index) {
-        if (index >= length) {
-            index -= length;
-        }
-        return brightestColor[index];
-    }
 
-    public Color getDarkestColor(int index) {
-        if (index >= length) {
-            index -= length;
-        }
-        return darkestColor[index];
-    }
-
-    public Color getNormalColor(int index) {
-        if (index >= length) {
-            index -= length;
-        }
-        if (index < 0) {
-            index = length - 1;
-        }
+    public Color getBackgroundColor(int level) {
+        int index = (level - 1) % brightestColor.length;
         return normalColor[index];
     }
 
-    public int getIndex() {
-        return index;
-    }
 
-    public void setColor(Actor actor1, Actor actor2, Actor actor3) {
-        if (index >= length) {
-            index -= length;
-        }
+    public void setColor(int level, Actor actor1, Actor actor2, Actor actor3) {
+        int index = (level - 1) % brightestColor.length;
         actor1.setColor(brightestColor[index]);
         actor2.setColor(normalColor[index]);
         actor3.setColor(darkestColor[index]);
-        index++;
+    }
+
+    public void setColorUnlimitedMode(int score, Actor background ,Actor len2, Actor len3, Actor len4) {
+        int index = score % brightestColor.length;
+        colorLen2Action.setup(len2.getColor(), brightestColor[index], COLOR_TRANSFORM_DURATION);
+        len2.addAction(colorLen2Action);
+        colorLen3Action.setup(len3.getColor(), normalColor[index], COLOR_TRANSFORM_DURATION);
+        len3.addAction(colorLen3Action);
+        colorLen4Action.setup(len4.getColor(), darkestColor[index], COLOR_TRANSFORM_DURATION);
+        len4.addAction(colorLen4Action);
+
+        colorBackgroundAction.setup(background.getColor(), normalColor[index], COLOR_TRANSFORM_DURATION);
+        background.addAction(colorBackgroundAction);
+
+    }
+
+    public Color getBackGroundColorUnlimitedMode(int score){
+        return normalColor[score];
     }
 
     public void dispose() {
@@ -103,5 +103,22 @@ public class ColorHelper {
 
     private static class ColorItem {
         String len2, len3, len4;
+    }
+
+    public static class MyColorAction extends ColorAction {
+        @Override
+        public boolean act(float delta) {
+            boolean complete = super.act(delta);
+            if (complete) {
+                this.reset();
+            }
+            return complete;
+        }
+
+        public void setup(Color from, Color to, float duration) {
+            super.setColor(from);
+            super.setEndColor(to);
+            super.setDuration(duration);
+        }
     }
 }
