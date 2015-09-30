@@ -558,16 +558,16 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     }
 
     private void initTextView() {
-        level = new TextView(Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri.fnt"), Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri.png"));
-        index = new TextView(Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri_index.fnt"), Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "calibri_index.png"));
+        level = new TextView(Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "merlo_level.fnt"), Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "merlo_level.png"));
+        index = new TextView(Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "merlo_index.fnt"), Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "merlo_index.png"));
         updateTextView(1);
         updateTextView(2);
 
         stage.addActor(level);
         stage.addActor(index);
 
-        level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 4 - level.getHeight());
-        index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2, 3 * stage.getViewport().getWorldHeight() / 4 + 1.75f * index.getHeight());
+        level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 3.5f - level.getHeight());
+        index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2, 3 * stage.getViewport().getWorldHeight() / 4 + 1.5f * index.getHeight());
     }
 
     private void initButton() {
@@ -659,34 +659,26 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
     public void updateTextView(int type) {
         switch (type) {
-            case 1:
+            case 1://update Level
                 if (gameMode == Constants.GameMode.UNLIMITED) {
                     level.setText("My Best: " + unlimitedBestScore);
-                    if (unlimitedBestScore % 10 == 0) {
-                        level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
-                    }
+                    level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
                 } else {
                     level.setText("Level: " + classicLevel);
-                    if (classicLevel % 10 == 0) {
-                        level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
-                    }
+                    level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
                 }
                 break;
-            case 2:
+            case 2://update Index
                 if (gameMode == Constants.GameMode.UNLIMITED) {
                     index.setText("" + unlimitedScore);
-                    if (unlimitedScore % 10 == 0) {
-                        index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
-                    }
+                    index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
                     if (unlimitedScore >= unlimitedBestScore) {
                         unlimitedBestScore = unlimitedScore;
                         updateTextView(1);
                     }
                 } else {
                     index.setText("" + classicScore);
-                    if ((classicScore + 1) % 10 == 0 || classicScore == classicLevel) {
-                        index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
-                    }
+                    index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
                 }
                 break;
         }
