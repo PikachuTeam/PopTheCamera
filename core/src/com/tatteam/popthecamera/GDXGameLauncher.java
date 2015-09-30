@@ -56,7 +56,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public static boolean touchable = true;
     private static boolean checkable = true;
 
-    private Constants.GameMode gameMode = Constants.GameMode.UNLIMITED;
+    private Constants.GameMode gameMode = Constants.GameMode.CLASSIC_SLOW;
     private OnGameListener onGameListener;
     private int unlimitedScore = 0;
     private int unlimitedBestScore = 0;
@@ -86,8 +86,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         atlas = new TextureAtlas(Gdx.files.internal(AssetsLoader.getInstance().getImagePath() + "pop_the_camera.pack"));
 
-        ColorHelper.getInstance().initColor();
-        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(0);
+        ColorHelper.getInstance().initColor(classicLevel);
+        currentBackgroundColor = ColorHelper.getInstance().getNormalColor(ColorHelper.getInstance().getIndex());
 
         init();
 
@@ -288,7 +288,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
                         Log.writeLog("Ting ting.");
                         SoundHelper.getInstance().playSuccessSound();
-                        if (classicScore != 0 || gameMode ==  Constants.GameMode.UNLIMITED) {
+                        if (classicScore != 0 || gameMode == Constants.GameMode.UNLIMITED) {
                             increaseUnlimitedSeedIfNeeded();
                             currentOrientation = indicator.clockwise;
                             dot.fadeOut(2);
@@ -381,7 +381,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 if (this.onGameListener != null) {
                     onGameListener.onLossGame(this, gameMode, classicLevel, classicScore);
                 }
-//                saveData();
                 resetScoreAtUnlimitedModeIfNeeded();
                 break;
         }
@@ -589,16 +588,16 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         SoundHelper.enableSound = preferences.getBoolean("sound", true);
         VibrationHelper.enableVibration = preferences.getBoolean("vibration", true);
-        if(gameMode== Constants.GameMode.UNLIMITED){
-            unlimitedBestScore= preferences.getInteger("unlimited_best_score", 0);
-        }else{
-            if(gameMode == Constants.GameMode.CLASSIC_SLOW){
+        if (gameMode == Constants.GameMode.UNLIMITED) {
+            unlimitedBestScore = preferences.getInteger("unlimited_best_score", 0);
+        } else {
+            if (gameMode == Constants.GameMode.CLASSIC_SLOW) {
                 classicLevel = preferences.getInteger("classic_slow", 1);
-            }else if(gameMode == Constants.GameMode.CLASSIC_MEDIUM){
+            } else if (gameMode == Constants.GameMode.CLASSIC_MEDIUM) {
                 classicLevel = preferences.getInteger("classic_medium", 1);
-            }else if(gameMode == Constants.GameMode.CLASSIC_FAST){
+            } else if (gameMode == Constants.GameMode.CLASSIC_FAST) {
                 classicLevel = preferences.getInteger("classic_fast", 1);
-            }else if(gameMode == Constants.GameMode.CLASSIC_CRAZY){
+            } else if (gameMode == Constants.GameMode.CLASSIC_CRAZY) {
                 classicLevel = preferences.getInteger("classic_crazy", 1);
             }
             classicScore = classicLevel;
@@ -609,16 +608,16 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
         preferences.putBoolean("sound", SoundHelper.enableSound);
         preferences.putBoolean("vibration", VibrationHelper.enableVibration);
-        if(gameMode== Constants.GameMode.UNLIMITED){
+        if (gameMode == Constants.GameMode.UNLIMITED) {
             preferences.putInteger("unlimited_best_score", unlimitedBestScore);
-        }else{
-            if(gameMode == Constants.GameMode.CLASSIC_SLOW){
+        } else {
+            if (gameMode == Constants.GameMode.CLASSIC_SLOW) {
                 preferences.putInteger("classic_slow", classicLevel);
-            }else if(gameMode == Constants.GameMode.CLASSIC_MEDIUM){
+            } else if (gameMode == Constants.GameMode.CLASSIC_MEDIUM) {
                 preferences.putInteger("classic_medium", classicLevel);
-            }else if(gameMode == Constants.GameMode.CLASSIC_FAST){
+            } else if (gameMode == Constants.GameMode.CLASSIC_FAST) {
                 preferences.putInteger("classic_fast", classicLevel);
-            }else if(gameMode == Constants.GameMode.CLASSIC_CRAZY){
+            } else if (gameMode == Constants.GameMode.CLASSIC_CRAZY) {
                 preferences.putInteger("classic_crazy", classicLevel);
             }
         }
@@ -657,12 +656,12 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public void updateTextView(int type) {
         switch (type) {
             case 1:
-                if(gameMode== Constants.GameMode.UNLIMITED){
+                if (gameMode == Constants.GameMode.UNLIMITED) {
                     level.setText("My Best: " + unlimitedBestScore);
                     if (unlimitedBestScore % 10 == 0) {
                         level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
                     }
-                }else{
+                } else {
                     level.setText("Level: " + classicLevel);
                     if (classicLevel % 10 == 0) {
                         level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
@@ -670,16 +669,16 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 }
                 break;
             case 2:
-                if(gameMode== Constants.GameMode.UNLIMITED){
+                if (gameMode == Constants.GameMode.UNLIMITED) {
                     index.setText("" + unlimitedScore);
-                    if (unlimitedScore % 10 == 0){
+                    if (unlimitedScore % 10 == 0) {
                         index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
                     }
-                    if(unlimitedScore>=unlimitedBestScore){
+                    if (unlimitedScore >= unlimitedBestScore) {
                         unlimitedBestScore = unlimitedScore;
                         updateTextView(1);
                     }
-                }else{
+                } else {
                     index.setText("" + classicScore);
                     if ((classicScore + 1) % 10 == 0 || classicScore == classicLevel) {
                         index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
@@ -701,26 +700,25 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         return gameMode;
     }
 
-    private void resetScoreAtUnlimitedModeIfNeeded(){
-        if (gameMode ==  Constants.GameMode.UNLIMITED) {
+    private void resetScoreAtUnlimitedModeIfNeeded() {
+        if (gameMode == Constants.GameMode.UNLIMITED) {
             unlimitedScore = 0;
             gameMode.resetUnlimitedSpeed();
         }
     }
 
-    private void increaseUnlimitedSeedIfNeeded(){
-        if(gameMode== Constants.GameMode.UNLIMITED){
+    private void increaseUnlimitedSeedIfNeeded() {
+        if (gameMode == Constants.GameMode.UNLIMITED) {
             unlimitedScore++;
             updateTextView(2);
-            if(unlimitedScore % Constants.GameMode.UNLIMITED_INCREASING_POINT==0){
+            if (unlimitedScore % Constants.GameMode.UNLIMITED_INCREASING_POINT == 0) {
                 indicator.setSpeed(gameMode.getUnlimitedNewSpeed());
             }
         }
     }
 
 
-
-    public static interface OnGameListener{
-        public void onLossGame(GDXGameLauncher gameLauncher,  Constants.GameMode gameMode, int currentLevel, int score);
+    public static interface OnGameListener {
+        public void onLossGame(GDXGameLauncher gameLauncher, Constants.GameMode gameMode, int currentLevel, int score);
     }
 }
