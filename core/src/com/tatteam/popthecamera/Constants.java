@@ -22,13 +22,13 @@ public class Constants {
         CLASSIC_MEDIUM(1.6f),
         CLASSIC_FAST(2.0f),
         CLASSIC_CRAZY(2.4f),
-        UNLIMITED(1.0f);//start from 1.0 and increase after each two level
+        UNLIMITED(1.0f);//start from 1.0 and increase after each point
 
         public static final int UNLIMITED_INCREASING_POINT = 1;
         public static final float UNLIMITED_MAX_SPEED = 2.7f;
+        public static final float UNLIMITED_INCREASING_SPEED = 0.01f;
 
         private float speed;
-        private float increasingSpeed = 0.01f;
 
         private GameMode(float speed) {
             this.speed = speed;
@@ -41,7 +41,7 @@ public class Constants {
         public float getUnlimitedNewSpeed() {
             if (this == UNLIMITED) {
                 if (speed < UNLIMITED_MAX_SPEED) {
-                    speed += increasingSpeed;
+                    speed += UNLIMITED_INCREASING_SPEED;
                 }
                 return speed;
             }
@@ -50,7 +50,7 @@ public class Constants {
 
         public void resetUnlimitedSpeed() {
             if (this == UNLIMITED) {
-                this.speed = 1.2f;
+                this.speed = 1.0f;
             }
         }
     }

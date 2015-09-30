@@ -37,8 +37,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     private Lens lens3;
     private Lens lens4;
     private CameraButton cameraButton;
-    private int number;
-    private int currentIndex;
+    private int classicLevel;
+    private int classicScore;
     private double indicatorBeta;
     private double dotBeta;
     private boolean playAgain = false;
@@ -270,7 +270,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                     }
                     delta -= e;
                     if (delta <= dotBeta / 2) {
-                        currentIndex--;
+                        classicScore--;
                         updateTextView(2);
                         Log.writeLog("Check touch");
                         Log.writeLog("Indicator Rotation", "" + indicationRotation);
@@ -280,7 +280,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
                         Log.writeLog("Ting ting.");
                         SoundHelper.getInstance().playSuccessSound();
-                        if (currentIndex != 0 || gameMode ==  Constants.GameMode.UNLIMITED) {
+                        if (classicScore != 0 || gameMode ==  Constants.GameMode.UNLIMITED) {
                             increaseUnlimitedSeedIfNeeded();
                             currentOrientation = indicator.clockwise;
                             dot.fadeOut(2);
@@ -360,7 +360,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     private void stopGame(int situation) {
         switch (situation) {
             case 1:
-                number++;
+                classicLevel++;
                 cameraButton.press();
                 break;
             case 2:
@@ -371,12 +371,13 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 VibrationHelper.vibrate(1);
                 currentBackgroundColor = ColorHelper.FAIL_COLOR;
                 if (this.onGameListener != null) {
-                    onGameListener.onLossGame(this, gameMode, number, currentIndex);
+                    onGameListener.onLossGame(this, gameMode, classicLevel, classicScore);
                 }
-                saveAndResetScoreAtUnlimitedModeIfNeeded();
+//                saveData();
+                resetScoreAtUnlimitedModeIfNeeded();
                 break;
         }
-        currentIndex = number;
+        classicScore = classicLevel;
         indicator.isMoving = false;
     }
 
@@ -535,22 +536,41 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
     private void loadData() {
         preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
-        number = preferences.getInteger("number", 1);
-        currentIndex = number;
+
         SoundHelper.enableSound = preferences.getBoolean("sound", true);
         VibrationHelper.enableVibration = preferences.getBoolean("vibration", true);
         if(gameMode== Constants.GameMode.UNLIMITED){
             unlimitedBestScore= preferences.getInteger("unlimited_best_score", 0);
+        }else{
+            if(gameMode == Constants.GameMode.CLASSIC_SLOW){
+                classicLevel = preferences.getInteger("classic_slow", 1);
+            }else if(gameMode == Constants.GameMode.CLASSIC_MEDIUM){
+                classicLevel = preferences.getInteger("classic_medium", 1);
+            }else if(gameMode == Constants.GameMode.CLASSIC_FAST){
+                classicLevel = preferences.getInteger("classic_fast", 1);
+            }else if(gameMode == Constants.GameMode.CLASSIC_CRAZY){
+                classicLevel = preferences.getInteger("classic_crazy", 1);
+            }
+            classicScore = classicLevel;
         }
     }
 
     private void saveData() {
         preferences = Gdx.app.getPreferences(Constants.APP_TITLE);
-        preferences.putInteger("number", number);
         preferences.putBoolean("sound", SoundHelper.enableSound);
         preferences.putBoolean("vibration", VibrationHelper.enableVibration);
         if(gameMode== Constants.GameMode.UNLIMITED){
             preferences.putInteger("unlimited_best_score", unlimitedBestScore);
+        }else{
+            if(gameMode == Constants.GameMode.CLASSIC_SLOW){
+                preferences.putInteger("classic_slow", classicLevel);
+            }else if(gameMode == Constants.GameMode.CLASSIC_MEDIUM){
+                preferences.putInteger("classic_medium", classicLevel);
+            }else if(gameMode == Constants.GameMode.CLASSIC_FAST){
+                preferences.putInteger("classic_fast", classicLevel);
+            }else if(gameMode == Constants.GameMode.CLASSIC_CRAZY){
+                preferences.putInteger("classic_crazy", classicLevel);
+            }
         }
         preferences.flush();
     }
@@ -593,8 +613,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
                     }
                 }else{
-                    level.setText("Level: " + number);
-                    if (number % 10 == 0) {
+                    level.setText("Level: " + classicLevel);
+                    if (classicLevel % 10 == 0) {
                         level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
                     }
                 }
@@ -610,8 +630,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         updateTextView(1);
                     }
                 }else{
-                    index.setText("" + currentIndex);
-                    if ((currentIndex + 1) % 10 == 0 || currentIndex == number) {
+                    index.setText("" + classicScore);
+                    if ((classicScore + 1) % 10 == 0 || classicScore == classicLevel) {
                         index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
                     }
                 }
@@ -631,9 +651,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         return gameMode;
     }
 
-    private void saveAndResetScoreAtUnlimitedModeIfNeeded(){
+    private void resetScoreAtUnlimitedModeIfNeeded(){
         if (gameMode ==  Constants.GameMode.UNLIMITED) {
-            //save high unlimitedScore first
             unlimitedScore = 0;
             gameMode.resetUnlimitedSpeed();
         }
@@ -643,7 +662,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         if(gameMode== Constants.GameMode.UNLIMITED){
             unlimitedScore++;
             updateTextView(2);
-//            Log.writeLog(unlimitedScore + " - >>>>>>>>>>>>>>>>>>> - ");
             if(unlimitedScore % Constants.GameMode.UNLIMITED_INCREASING_POINT==0){
                 indicator.setSpeed(gameMode.getUnlimitedNewSpeed());
             }
