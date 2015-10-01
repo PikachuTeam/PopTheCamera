@@ -12,16 +12,18 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.tatteam.popthecamera.actors.AlphaRectangle;
 import com.tatteam.popthecamera.actors.Background;
 import com.tatteam.popthecamera.actors.Camera;
 import com.tatteam.popthecamera.actors.CameraButton;
 import com.tatteam.popthecamera.actors.Dot;
+import com.tatteam.popthecamera.actors.Flash;
 import com.tatteam.popthecamera.actors.Indicator;
 import com.tatteam.popthecamera.actors.Lens;
 import com.tatteam.popthecamera.actors.TextView;
 
-public class GDXGameLauncher extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, AlphaRectangle.OnDisappearListener, Dot.OnFadeCompleteListener {
+public class GDXGameLauncher extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, Flash.OnDisappearListener, Dot.OnFadeCompleteListener {
+
+    private Constants.GameMode gameMode = Constants.GameMode.CLASSIC_MEDIUM;
 
     private Viewport backgroundViewport;
     private Viewport fitViewport;
@@ -47,7 +49,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     private boolean playAgain = false;
     private TextView level;
     private TextView index;
-    private AlphaRectangle rectangle;
+    private Flash flash;
     private double e;
     private Color currentBackgroundColor;
     private Button soundButton;
@@ -59,11 +61,10 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public static boolean touchable = true;
     private static boolean checkable = true;
 
-    private Constants.GameMode gameMode = Constants.GameMode.CLASSIC_MEDIUM;
     private OnGameListener onGameListener;
     private int unlimitedScore = 0;
     private int unlimitedBestScore = 0;
-
+    private int unlimitedColorIndex = 0;
     private Background background;
 
     @Override
@@ -91,8 +92,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         backgroundViewport.update(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), true);
         backgroundStage.setViewport(backgroundViewport);
 
-        rectangle = new AlphaRectangle();
-        rectangle.setOnDisappearListener(this);
+        flash = new Flash();
+        flash.setOnDisappearListener(this);
 
 
         atlas = new TextureAtlas(Gdx.files.internal(AssetsLoader.getInstance().getImagePath() + "pop_the_camera.pack"));
@@ -266,9 +267,9 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             Log.writeLog("Check touch point", "" + touchPoint.x + " " + touchPoint.y);
             Log.writeLog("Sound button coordinate", "" + soundButton.getX() + " " + soundButton.getY());
             if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
-                soundButton.setImage("press_sound");
+                soundButton.setImage("off_sound");
             } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
-                vibrationButton.setImage("press_vibrate");
+                vibrationButton.setImage("off_vibrate");
             } else if (playAgain) {
                 dot.fadeOut(1);
                 indicator.fadeOut();
@@ -329,8 +330,10 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                             }
                             checkable = false;
 
-                            if (gameMode == Constants.GameMode.UNLIMITED && unlimitedScore % 1 == 0) {
-                                ColorHelper.getInstance().setColorUnlimitedMode(unlimitedScore,background ,lens2, lens3, lens4);
+                            if (gameMode == Constants.GameMode.UNLIMITED && unlimitedScore % 8 == 0) {
+                                unlimitedColorIndex ++;
+                                ColorHelper.getInstance().setColorUnlimitedMode(unlimitedColorIndex, background, lens2, lens3, lens4);
+                                currentBackgroundColor = ColorHelper.getInstance().getBackGroundColorUnlimitedMode(unlimitedColorIndex);
                             }
                         } else {
                             stopGame(1);
@@ -358,7 +361,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         fitViewport.unproject(touchPoint);
         if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
             if (SoundHelper.enableSound) {
-                soundButton.setImage("off_sound");
+                soundButton.setImage("press_sound");
                 SoundHelper.enableSound = false;
             } else {
                 SoundHelper.enableSound = true;
@@ -367,7 +370,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             }
         } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
             if (VibrationHelper.enableVibration) {
-                vibrationButton.setImage("off_vibrate");
+                vibrationButton.setImage("press_vibrate");
                 VibrationHelper.enableVibration = false;
             } else {
                 vibrationButton.setImage("on_vibrate");
@@ -571,17 +574,17 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         SoundHelper.getInstance().playFinishLevelSound();
         if (gameMode != Constants.GameMode.UNLIMITED) {
             Color color = ColorHelper.getInstance().getBackgroundColor(classicLevel);
-            rectangle.setColor(color.r, color.g, color.b, color.a * 0.5f);
-            rectangle.appear(splashStage);
+            flash.setColor(color.r, color.g, color.b, color.a * 0.5f);
+            flash.appear(splashStage);
             indicator.fadeOut();
             dot.fadeOut(1);
         }
     }
 
     @Override
-    public void onDisappear(AlphaRectangle alphaRectangle) {
+    public void onDisappear(Flash flash) {
         touchable = true;
-        alphaRectangle.getParent().removeActor(alphaRectangle);
+        flash.getParent().removeActor(flash);
         updateTextView(1);
         updateTextView(2);
         playAgain = false;
@@ -608,14 +611,14 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         if (SoundHelper.enableSound) {
             soundButton = new Button(atlas, "on_sound");
         } else {
-            soundButton = new Button(atlas, "off_sound");
+            soundButton = new Button(atlas, "press_sound");
         }
         soundButton.setPosition(fitViewport.getWorldWidth() - soundButton.getWidth() * 1.25f, fitViewport.getWorldHeight() - soundButton.getHeight() * 1.25f);
         soundButton.addTo(stage);
         if (VibrationHelper.enableVibration) {
             vibrationButton = new Button(atlas, "on_vibrate");
         } else {
-            vibrationButton = new Button(atlas, "off_vibrate");
+            vibrationButton = new Button(atlas, "press_vibrate");
         }
         vibrationButton.setPosition(soundButton.getX() - 5 * vibrationButton.getWidth() / 4, soundButton.getY());
         vibrationButton.addTo(stage);
@@ -681,6 +684,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             indicator.setRotation(0);
             playAgain = false;
             if (gameMode == Constants.GameMode.UNLIMITED) {
+                ColorHelper.getInstance().setColorUnlimitedMode(unlimitedScore, background, lens2, lens3, lens4);
                 currentBackgroundColor = ColorHelper.getInstance().getBackGroundColorUnlimitedMode(0);
             } else {
                 currentBackgroundColor = ColorHelper.getInstance().getBackgroundColor(classicLevel);
@@ -750,7 +754,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             }
         }
     }
-
 
     public static interface OnGameListener {
         public void onLossGame(GDXGameLauncher gameLauncher, Constants.GameMode gameMode, int currentLevel, int score);
