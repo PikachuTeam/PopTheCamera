@@ -23,7 +23,7 @@ import com.tatteam.popthecamera.actors.TextView;
 
 public class GDXGameLauncher extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, Flash.OnDisappearListener, Dot.OnFadeCompleteListener {
 
-    private Constants.GameMode gameMode = Constants.GameMode.CLASSIC_MEDIUM;
+    private Constants.GameMode gameMode = Constants.GameMode.CLASSIC_SLOW;
 
     private Viewport backgroundViewport;
     private Viewport fitViewport;
@@ -642,7 +642,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             } else if (gameMode == Constants.GameMode.CLASSIC_CRAZY) {
                 classicLevel = preferences.getInteger("classic_crazy", 1);
             }
-            classicLevel = 1;
             classicScore = classicLevel;
         }
     }
@@ -735,7 +734,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 break;
             case 3:
                 if (gameMode == Constants.GameMode.UNLIMITED) {
-                    classicType.setText("Unlimited");
+                    classicType.setText("No limit");
                 } else {
                     if (gameMode == Constants.GameMode.CLASSIC_SLOW) {
                         classicType.setText("Slow");
@@ -747,7 +746,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         classicType.setText("Crazy");
                     }
                 }
-                classicType.setPosition(10, fitViewport.getWorldHeight()-classicType.getHeight());
+                classicType.setPosition(fitViewport.getWorldWidth() - (soundButton.getX() + soundButton.getWidth()), fitViewport.getWorldHeight() - classicType.getHeight());
                 break;
         }
     }
