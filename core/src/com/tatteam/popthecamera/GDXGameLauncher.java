@@ -74,7 +74,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
     @Override
     public void create() {
-        Log.enableLog = false;
         touchable = true;
         loadData();
 
