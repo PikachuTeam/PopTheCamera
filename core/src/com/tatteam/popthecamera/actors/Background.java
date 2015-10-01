@@ -19,11 +19,6 @@ public class Background extends Actor {
         this.height = height;
     }
 
-    public void setSize(float width, float height){
-        this.width = width;
-        this.height = height;
-    }
-
     @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.end();
