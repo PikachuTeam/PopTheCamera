@@ -7,13 +7,17 @@ import com.badlogic.gdx.Gdx;
  */
 public class Log {
 
-    public static boolean enableLog = true;
+    private final static boolean LOG_ENABLE = false;
 
     public static void writeLog(String log) {
-        Gdx.app.log(Constants.APP_TITLE, log);
+        if(LOG_ENABLE) {
+            Gdx.app.log(Constants.APP_TITLE, log);
+        }
     }
 
     public static void writeLog(String title, String log) {
-        Gdx.app.log(Constants.APP_TITLE, title + ": " + log);
+        if(LOG_ENABLE) {
+            Gdx.app.log(Constants.APP_TITLE, title + ": " + log);
+        }
     }
 }

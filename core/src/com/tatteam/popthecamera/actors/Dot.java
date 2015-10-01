@@ -68,7 +68,7 @@ public class Dot extends Actor {
 
     public void randomPosition(boolean clockwise) {
         float rotation;
-        int rnd = random.nextInt(50) + 30;
+        int rnd = random.nextInt(50) + 40;
         if (clockwise) {
             rotation = getRotation() + rnd;
         } else {
@@ -83,7 +83,7 @@ public class Dot extends Actor {
     }
 
     public void fadeOut(int type) {
-        GDXGameLauncher.touchable=false;
+        GDXGameLauncher.touchable = false;
         this.type = type;
         fadeOut.setAlpha(0f);
         fadeOut.setDuration(0.15f);

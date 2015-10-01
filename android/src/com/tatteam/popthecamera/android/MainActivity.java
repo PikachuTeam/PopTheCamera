@@ -15,7 +15,7 @@ import hotchemi.android.rate.AppRate;
 import hotchemi.android.rate.OnClickButtonListener;
 
 public class MainActivity extends FragmentActivity implements AndroidFragmentApplication.Callbacks {
-    public static final boolean ADS_ENABLE = false;
+    public static final boolean ADS_ENABLE = true;
 
     private View layout_flash, layout_flash_background;
     private boolean isBackKeyAvailable = false;
@@ -52,9 +52,7 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
                 if (!showRateAppDialog()) {
                     handleDoubleBackToExit();
                 }
-
             }
-
         }
     }
 
