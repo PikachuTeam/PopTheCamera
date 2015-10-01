@@ -21,12 +21,12 @@ public class Constants {
         CLASSIC_SLOW(1.0f),
         CLASSIC_MEDIUM(1.6f),
         CLASSIC_FAST(2.0f),
-        CLASSIC_CRAZY(2.4f),
+        CLASSIC_CRAZY(2.5f),
         UNLIMITED(1.0f);//start from 1.0 and increase after each point
 
         public static final int UNLIMITED_INCREASING_POINT = 1;
-        public static final float UNLIMITED_MAX_SPEED = 2.7f;
-        public static final float UNLIMITED_INCREASING_SPEED = 0.01f;
+        public static final float UNLIMITED_MAX_SPEED = CLASSIC_CRAZY.getSpeed();
+        public static final float UNLIMITED_INCREASING_SPEED = 0.015f;
 
         private float speed;
 

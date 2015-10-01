@@ -50,24 +50,23 @@ public class ColorHelper {
 
 
     public Color getBackgroundColor(int level) {
-        int index = (level - 1) % brightestColor.length;
+        int index = (level - 0) % brightestColor.length;
         return normalColor[index];
     }
 
 
     public void setColor(int level, Actor actor1, Actor actor2, Actor actor3) {
-        int index = (level - 1) % brightestColor.length;
+        int index = (level - 0) % brightestColor.length;
         actor1.setColor(brightestColor[index]);
         actor2.setColor(normalColor[index]);
         actor3.setColor(darkestColor[index]);
     }
 
-    public void setColorUnlimitedMode(int score, Actor background ,Actor len2, Actor len3, Actor len4) {
+    public void setColorUnlimitedMode(int score ,Actor len2, Actor len3, Actor len4) {
         int index = score % brightestColor.length;
         len2.setColor(brightestColor[index]);
         len3.setColor(normalColor[index]);
         len4.setColor(darkestColor[index]);
-        background.setColor(normalColor[index]);
     }
 
     public Color getBackGroundColorUnlimitedMode(int score){
