@@ -1,0 +1,24 @@
+<resources>
+    <dimen name="activity_horizontal_margin">30.08dp</dimen>
+    <dimen name="activity_vertical_margin">30.08dp</dimen>
+
+    <dimen name="mode_game_text_size">75.2sp</dimen>
+    <dimen name="mode_game_text_size2">97.76sp</dimen>
+    <dimen name="width_button">432.4dp</dimen>
+    <dimen name="height_button">122.2dp</dimen>
+    <dimen name="margin_menu">30.08dp</dimen>
+    <dimen name="margin_menu2">69.56dp</dimen>
+    <dimen name="margin_menu3">9.4dp</dimen>
+    <dimen name="next_button_size">94dp</dimen>
+    <dimen name="card_contentPadding">18.8dp</dimen>
+    <dimen name="margin_level">9.4dp</dimen>
+    <dimen name="margin_unlimited">65.8dp</dimen>
+    <dimen name="margin_flash_screen">94dp</dimen>
+    <dimen name="width_flash_screen">752dp</dimen>
+    <dimen name="height_flash_screen">620.4dp</dimen>
+    <dimen name="home_image_banner_width">601.6dp</dimen>
+    <dimen name="home_image_banner_height">376dp</dimen>
+    <dimen name="home_image_banner_margin_top">56.4dp</dimen>
+    <dimen name="home_image_banner_margin_bottom">28.2dp</dimen>
+    <dimen name="text_padding">0dp</dimen>
+</resources>

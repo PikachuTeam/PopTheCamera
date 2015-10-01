@@ -2,29 +2,29 @@
     xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#006064">
+    android:background="@color/background">
+
+    <ImageView
+        android:id="@+id/img_banner"
+        android:layout_width="@dimen/home_image_banner_width"
+        android:layout_height="@dimen/home_image_banner_height"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/home_image_banner_margin_bottom"
+        android:layout_marginTop="@dimen/home_image_banner_margin_top"
+        android:src="@drawable/home_banner" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:orientation="vertical">
+        android:layout_below="@+id/img_banner"
+        android:layout_centerHorizontal="true"
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="@dimen/margin_menu2"
-            android:text="Pop The Camera"
-            android:textColor="#FFFFFF"
-            android:textSize="@dimen/game_name_text_size"
-            android:textStyle="bold" />
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="@dimen/width_button"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="@dimen/margin_level"
             android:gravity="center"
             android:orientation="horizontal"
             android:weightSum="100">
@@ -32,78 +32,89 @@
             <RelativeLayout
                 android:id="@+id/btnPreMode"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/next_button_size2"
+                android:layout_height="wrap_content"
                 android:layout_weight="25">
 
                 <ImageView
                     android:layout_width="@dimen/next_button_size"
                     android:layout_height="@dimen/next_button_size"
                     android:layout_centerInParent="true"
-                    android:background="@drawable/pre" />
+                    android:background="@drawable/button_pre_bg" />
             </RelativeLayout>
 
             <TextView
                 android:id="@+id/tvLevel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="50"
                 android:gravity="center"
-                android:text="Medium"
-                android:textSize="@dimen/mode_game_text_size"
-                android:textStyle="italic" />
+                android:paddingBottom="@dimen/text_padding"
+                android:singleLine="true"
+                android:text="MEDIUM"
+                android:textColor="@color/text_classic_mode"
+                android:textSize="@dimen/mode_game_text_size" />
 
             <RelativeLayout
                 android:id="@+id/btnNextMode"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/next_button_size"
+                android:layout_height="wrap_content"
                 android:layout_weight="25">
 
                 <ImageView
                     android:layout_width="@dimen/next_button_size"
                     android:layout_height="@dimen/next_button_size"
                     android:layout_centerInParent="true"
-                    android:background="@drawable/next" />
+                    android:background="@drawable/button_next_bg" />
             </RelativeLayout>
         </LinearLayout>
 
-        <Button
+        <RelativeLayout
             android:id="@+id/btn_classical_mode"
             android:layout_width="@dimen/width_button"
             android:layout_height="@dimen/height_button"
             android:layout_gravity="center"
-            android:gravity="center"
-            android:text="Classic"
-            android:textColor="#004d50"
-            android:textSize="@dimen/mode_game_text_size2"
-            android:textStyle="bold" />
+            android:background="@drawable/button_bg"
+            android:gravity="center">
 
-        <Button
+            <TextView
+                android:id="@+id/tv_classical_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:paddingBottom="@dimen/text_padding"
+                android:text="CLASSIC"
+                android:textColor="@color/text_button"
+                android:textSize="@dimen/mode_game_text_size2" />
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/btn_unlimited_mode"
             android:layout_width="@dimen/width_button"
             android:layout_height="@dimen/height_button"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/margin_unlimited"
-            android:gravity="center"
-            android:text="Unlimited"
-            android:textColor="#004d50"
-            android:textSize="@dimen/mode_game_text_size2"
-            android:textStyle="bold" />
+            android:background="@drawable/button_bg">
 
+            <TextView
+                android:id="@+id/tv_unlimited_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:paddingBottom="@dimen/text_padding"
+                android:text="NO LIMIT"
+                android:textColor="@color/text_button"
+                android:textSize="@dimen/mode_game_text_size2" />
+        </RelativeLayout>
     </LinearLayout>
 
-    <RelativeLayout
-        android:id="@+id/layout_ads"
-        android:layout_width="match_parent"
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="@string/small_banner_ad_unit_id" />
 
-        <com.google.android.gms.ads.AdView
-            android:id="@+id/adView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            ads:adSize="SMART_BANNER"
-            ads:adUnitId="@string/small_banner_ad_unit_id" />
-    </RelativeLayout>
 </RelativeLayout>
