@@ -23,7 +23,7 @@ import com.tatteam.popthecamera.actors.TextView;
 
 public class GDXGameLauncher extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, Flash.OnDisappearListener, Dot.OnFadeCompleteListener {
 
-    private Constants.GameMode gameMode = Constants.GameMode.CLASSIC_SLOW;
+    private Constants.GameMode gameMode = Constants.GameMode.UNLIMITED;
     private final int CLASSIC_COLOR_STEP = 3;
     private final int UNLIMITED_COLOR_STEP = 5;
 
@@ -114,15 +114,18 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         init();
 
-        dot.initPosition();
-
         stage.addActor(cameraGroup.getActors());
 
+        dot.initPosition();
         if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
             indicator.clockwise = false;
         } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
             indicator.clockwise = true;
         }
+
+//        dot.setRotation(3);
+//        indicator.setRotation(340);
+//        indicator.clockwise=false;
 
         touchPoint = new Vector3();
 
@@ -774,7 +777,9 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         if (gameMode == Constants.GameMode.UNLIMITED) {
             saveData();
             unlimitedScore = 0;
+            unlimitedColorIndex =0;
             gameMode.resetUnlimitedSpeed();
+            indicator.setSpeed(gameMode.getSpeed());
         }
     }
 
