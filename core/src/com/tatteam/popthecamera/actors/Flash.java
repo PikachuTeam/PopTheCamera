@@ -21,7 +21,7 @@ public class Flash extends Actor {
     private float width;
     private float height;
 
-    public Flash() {
+    public Flash(float width, float height) {
         rectangle = new ShapeRenderer();
         alphaAction = new AlphaAction() {
             public boolean act(float delta) {
@@ -35,6 +35,8 @@ public class Flash extends Actor {
                 return complete;
             }
         };
+        this.width = width;
+        this.height = height;
     }
 
     public void setOnDisappearListener(OnDisappearListener listener) {
@@ -44,8 +46,6 @@ public class Flash extends Actor {
     public void appear(Stage stage) {
         stage.addActor(this);
         GDXGameLauncher.touchable = false;
-        width = stage.getViewport().getWorldWidth();
-        height = stage.getViewport().getWorldHeight();
         alphaAction.setAlpha(1f);
         alphaAction.setDuration(0.2f);
         addAction(alphaAction);

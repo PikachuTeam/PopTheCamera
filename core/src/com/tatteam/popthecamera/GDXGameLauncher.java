@@ -49,6 +49,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     private boolean playAgain = false;
     private TextView level;
     private TextView index;
+    private TextView classicType;
     private Flash flash;
     private double e;
     private Color currentBackgroundColor;
@@ -88,13 +89,12 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         screenViewport.update(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), true);
         splashStage.setViewport(screenViewport);
 
-        backgroundViewport= new ScreenViewport();
+        backgroundViewport = new ScreenViewport();
         backgroundViewport.update(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), true);
         backgroundStage.setViewport(backgroundViewport);
 
-        flash = new Flash();
+        flash = new Flash(screenViewport.getWorldWidth(),screenViewport.getWorldHeight());
         flash.setOnDisappearListener(this);
-
 
         atlas = new TextureAtlas(Gdx.files.internal(AssetsLoader.getInstance().getImagePath() + "pop_the_camera.pack"));
 
@@ -105,7 +105,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             ColorHelper.getInstance().initColor();
             currentBackgroundColor = ColorHelper.getInstance().getBackgroundColor(classicLevel);
         }
-        background = new Background(screenViewport.getWorldWidth(),screenViewport.getWorldHeight());
+        background = new Background(backgroundViewport.getWorldWidth(), backgroundViewport.getWorldHeight());
         backgroundStage.addActor(background);
 
         init();
@@ -135,7 +135,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         checkOver();
 
         backgroundViewport.apply();
-        background.setSize(screenViewport.getWorldWidth(), screenViewport.getWorldHeight());
         background.setColor(currentBackgroundColor);
         backgroundStage.act();
         backgroundStage.draw();
@@ -165,7 +164,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         fitViewport.update(width, height, true);
         screenViewport.update(width, height, true);
         backgroundViewport.update(width, height, true);
-        background.setSize(screenViewport.getWorldWidth(), screenViewport.getWorldHeight());
     }
 
     private void init() {
@@ -331,7 +329,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                             checkable = false;
 
                             if (gameMode == Constants.GameMode.UNLIMITED && unlimitedScore % 8 == 0) {
-                                unlimitedColorIndex ++;
+                                unlimitedColorIndex++;
                                 ColorHelper.getInstance().setColorUnlimitedMode(unlimitedColorIndex, background, lens2, lens3, lens4);
                                 currentBackgroundColor = ColorHelper.getInstance().getBackGroundColorUnlimitedMode(unlimitedColorIndex);
                             }
@@ -597,11 +595,15 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     private void initTextView() {
         level = new TextView(Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "merlo_level.fnt"), Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "merlo_level.png"));
         index = new TextView(Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "merlo_index.fnt"), Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "merlo_index.png"));
+        classicType = new TextView(Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "merlo_mode.fnt"), Gdx.files.internal(AssetsLoader.getInstance().getFontPath() + "merlo_mode.png"));
+
         updateTextView(1);
         updateTextView(2);
+        updateTextView(3);
 
         stage.addActor(level);
         stage.addActor(index);
+        stage.addActor(classicType);
 
         level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 3.5f - level.getHeight());
         index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2, 3 * stage.getViewport().getWorldHeight() / 4 + 1.5f * index.getHeight());
@@ -641,6 +643,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             } else if (gameMode == Constants.GameMode.CLASSIC_CRAZY) {
                 classicLevel = preferences.getInteger("classic_crazy", 1);
             }
+            classicLevel = 1;
             classicScore = classicLevel;
         }
     }
@@ -703,16 +706,16 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         switch (type) {
             case 1://update Level
                 if (gameMode == Constants.GameMode.UNLIMITED) {
-                    if(unlimitedBestScore<=999) {
+                    if (unlimitedBestScore <= 999) {
                         level.setText("My Best: " + unlimitedBestScore);
-                    }else{
+                    } else {
                         level.setText("My Best: 999+");
                     }
                     level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
                 } else {
-                    if(classicLevel<=999) {
+                    if (classicLevel <= 999) {
                         level.setText("Level: " + classicLevel);
-                    }else{
+                    } else {
                         level.setText("Level: 999+");
                     }
                     level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
@@ -730,6 +733,22 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                     index.setText("" + classicScore);
                     index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
                 }
+                break;
+            case 3:
+                if (gameMode == Constants.GameMode.UNLIMITED) {
+                    classicType.setText("UNLIMITED");
+                } else {
+                    if (gameMode == Constants.GameMode.CLASSIC_SLOW) {
+                        classicType.setText("SLOW");
+                    } else if (gameMode == Constants.GameMode.CLASSIC_MEDIUM) {
+                        classicType.setText("MEDIUM");
+                    } else if (gameMode == Constants.GameMode.CLASSIC_FAST) {
+                        classicType.setText("FAST");
+                    } else {
+                        classicType.setText("CRAZY");
+                    }
+                }
+                classicType.setPosition(10, stage.getViewport().getWorldHeight() - classicType.getHeight() / 1.5f);
                 break;
         }
     }
