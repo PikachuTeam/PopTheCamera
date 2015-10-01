@@ -13,7 +13,7 @@ import com.tatteam.popthecamera.GDXGameLauncher;
 /**
  * Created by dongc_000 on 9/26/2015.
  */
-public class AlphaRectangle extends Actor {
+public class Flash extends Actor {
 
     private ShapeRenderer rectangle;
     private OnDisappearListener listener;
@@ -21,7 +21,7 @@ public class AlphaRectangle extends Actor {
     private float width;
     private float height;
 
-    public AlphaRectangle() {
+    public Flash() {
         rectangle = new ShapeRenderer();
         alphaAction = new AlphaAction() {
             public boolean act(float delta) {
@@ -29,7 +29,7 @@ public class AlphaRectangle extends Actor {
                 if (complete) {
                     if (listener != null) {
                         alphaAction.reset();
-                        listener.onDisappear(AlphaRectangle.this);
+                        listener.onDisappear(Flash.this);
                     }
                 }
                 return complete;
@@ -65,6 +65,6 @@ public class AlphaRectangle extends Actor {
     }
 
     public interface OnDisappearListener {
-        void onDisappear(AlphaRectangle alphaRectangle);
+        void onDisappear(Flash flash);
     }
 }

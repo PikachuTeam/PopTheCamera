@@ -2,6 +2,7 @@ package com.tatteam.popthecamera.android;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,7 +26,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private View btnClassicalMode;
     private View btnUnlimitedMode;
     private View btnNext, btnPre;
-    private TextView tvLevel;
+    private TextView tvLevel,tvClassicMode, tvtUnlimitedMode;
+    private Typeface tf;
     private MediaPlayer changeLevel, enterMode;
     private int levelIndex = 1;
 
@@ -53,12 +55,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     public void findViews(View parent) {
+        tf = Typeface.createFromAsset(getActivity().getAssets(),
+                "fonts/utm_bebas.ttf");
         mAdView = (AdView) parent.findViewById(R.id.adView);
         btnNext = parent.findViewById(R.id.btnNextMode);
         btnPre = parent.findViewById(R.id.btnPreMode);
         btnClassicalMode = parent.findViewById(R.id.btn_classical_mode);
         btnUnlimitedMode = parent.findViewById(R.id.btn_unlimited_mode);
         tvLevel = (TextView) parent.findViewById(R.id.tvLevel);
+        tvClassicMode= (TextView) parent.findViewById(R.id.tv_classical_mode);
+        tvtUnlimitedMode= (TextView) parent.findViewById(R.id.tv_unlimited_mode);
+
+        tvLevel.setTypeface(tf);
+        tvClassicMode.setTypeface(tf);
+        tvtUnlimitedMode.setTypeface(tf);
 
         btnNext.setSoundEffectsEnabled(false);
         btnPre.setSoundEffectsEnabled(false);
@@ -111,7 +121,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void updateLevelText() {
-        tvLevel.setText(LEVEL_NAMES[levelIndex]);
+        tvLevel.setText(LEVEL_NAMES[levelIndex].toUpperCase());
     }
 
     private int getClassicGameMode() {

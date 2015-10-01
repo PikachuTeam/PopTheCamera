@@ -16,15 +16,14 @@ public class ColorHelper {
     private Color[] brightestColor;
     private Color[] normalColor;
     private Color[] darkestColor;
-    private int index;
-    private int length;
     public final static Color FAIL_COLOR = new Color(0xff2d2dff);
     public final static Color FLASH_COLOR = new Color(0.93f, 0.93f, 0.93f, 0.37f);
 
     private ColorHelper() {
+
     }
 
-    public void initColor(int index) {
+    public void initColor() {
 
         Json json = new Json();
         ColorFactory colorFactory = json.fromJson(ColorFactory.class,
@@ -39,8 +38,7 @@ public class ColorHelper {
             normalColor[i] = new Color(Color.valueOf(colorFactory.colors.get(i).len3));
             darkestColor[i] = new Color(Color.valueOf(colorFactory.colors.get(i).len4));
         }
-        length = brightestColor.length;
-        this.index = index;
+
     }
 
     public static ColorHelper getInstance() {
@@ -50,42 +48,31 @@ public class ColorHelper {
         return instance;
     }
 
-    public Color getBrightestColor(int index) {
-        if (index >= length) {
-            index -= length;
-        }
-        return brightestColor[index];
-    }
 
-    public Color getDarkestColor(int index) {
-        if (index >= length) {
-            index -= length;
-        }
-        return darkestColor[index];
-    }
-
-    public Color getNormalColor(int index) {
-        if (index >= length) {
-            index -= length;
-        }
-        if (index < 0) {
-            index = length - 1;
-        }
+    public Color getBackgroundColor(int level) {
+        int index = (level - 1) % brightestColor.length;
         return normalColor[index];
     }
 
-    public int getIndex() {
-        return index;
-    }
 
-    public void setColor(Actor actor1, Actor actor2, Actor actor3) {
-        if (index >= length) {
-            index -= length;
-        }
+    public void setColor(int level, Actor actor1, Actor actor2, Actor actor3) {
+        int index = (level - 1) % brightestColor.length;
         actor1.setColor(brightestColor[index]);
         actor2.setColor(normalColor[index]);
         actor3.setColor(darkestColor[index]);
-        index++;
+    }
+
+    public void setColorUnlimitedMode(int score, Actor background ,Actor len2, Actor len3, Actor len4) {
+        int index = score % brightestColor.length;
+        len2.setColor(brightestColor[index]);
+        len3.setColor(normalColor[index]);
+        len4.setColor(darkestColor[index]);
+        background.setColor(normalColor[index]);
+    }
+
+    public Color getBackGroundColorUnlimitedMode(int score){
+        int index = score % brightestColor.length;
+        return normalColor[index];
     }
 
     public void dispose() {
@@ -104,4 +91,5 @@ public class ColorHelper {
     private static class ColorItem {
         String len2, len3, len4;
     }
+
 }
