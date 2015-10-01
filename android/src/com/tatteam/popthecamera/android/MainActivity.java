@@ -52,9 +52,7 @@ public class MainActivity extends FragmentActivity implements AndroidFragmentApp
                 if (!showRateAppDialog()) {
                     handleDoubleBackToExit();
                 }
-
             }
-
         }
     }
 

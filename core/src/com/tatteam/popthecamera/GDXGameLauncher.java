@@ -123,10 +123,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             indicator.clockwise = true;
         }
 
-//        dot.setRotation(3);
-//        indicator.setRotation(340);
-//        indicator.clockwise=false;
-
         touchPoint = new Vector3();
 
         Gdx.input.setInputProcessor(this);
@@ -526,7 +522,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         }
                     } else {
                         Log.writeLog("Aloha4");
-                        if (dot.getRotation() >= 270 && dot.getRotation() < 360) {
+                        if (dot.getRotation() >= 270 && dot.getRotation() <= 360) {
                             if (indicationRotation <= dot.getRotation()) {
                                 if (delta > dotBeta / 2) {
                                     Log.writeLog("Check over 4");
@@ -777,7 +773,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         if (gameMode == Constants.GameMode.UNLIMITED) {
             saveData();
             unlimitedScore = 0;
-            unlimitedColorIndex =0;
+            unlimitedColorIndex = 0;
             gameMode.resetUnlimitedSpeed();
             indicator.setSpeed(gameMode.getSpeed());
         }
