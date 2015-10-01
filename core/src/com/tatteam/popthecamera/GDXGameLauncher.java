@@ -703,10 +703,18 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         switch (type) {
             case 1://update Level
                 if (gameMode == Constants.GameMode.UNLIMITED) {
-                    level.setText("My Best: " + unlimitedBestScore);
+                    if(unlimitedBestScore<=999) {
+                        level.setText("My Best: " + unlimitedBestScore);
+                    }else{
+                        level.setText("My Best: 999+");
+                    }
                     level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
                 } else {
-                    level.setText("Level: " + classicLevel);
+                    if(classicLevel<=999) {
+                        level.setText("Level: " + classicLevel);
+                    }else{
+                        level.setText("Level: 999+");
+                    }
                     level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
                 }
                 break;
