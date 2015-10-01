@@ -93,7 +93,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         backgroundViewport.update(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), true);
         backgroundStage.setViewport(backgroundViewport);
 
-        flash = new Flash(screenViewport.getWorldWidth(),screenViewport.getWorldHeight());
+        flash = new Flash(screenViewport.getWorldWidth(), screenViewport.getWorldHeight());
         flash.setOnDisappearListener(this);
 
         atlas = new TextureAtlas(Gdx.files.internal(AssetsLoader.getInstance().getImagePath() + "pop_the_camera.pack"));
@@ -120,8 +120,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             indicator.clockwise = true;
         }
 
-        initButton();
-
         touchPoint = new Vector3();
 
         Gdx.input.setInputProcessor(this);
@@ -129,7 +127,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
     @Override
     public void render() {
-//        Gdx.gl.glClearColor(currentBackgroundColor.r, currentBackgroundColor.g, currentBackgroundColor.b, currentBackgroundColor.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         checkOver();
@@ -189,6 +186,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         cameraGroup.setOnShakeCompleteListener(this);
 
         indicator.setSpeed(gameMode.getSpeed());
+
+        initButton();
         initTextView();
     }
 
@@ -736,19 +735,19 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 break;
             case 3:
                 if (gameMode == Constants.GameMode.UNLIMITED) {
-                    classicType.setText("UNLIMITED");
+                    classicType.setText("Unlimited");
                 } else {
                     if (gameMode == Constants.GameMode.CLASSIC_SLOW) {
-                        classicType.setText("SLOW");
+                        classicType.setText("Slow");
                     } else if (gameMode == Constants.GameMode.CLASSIC_MEDIUM) {
-                        classicType.setText("MEDIUM");
+                        classicType.setText("Medium");
                     } else if (gameMode == Constants.GameMode.CLASSIC_FAST) {
-                        classicType.setText("FAST");
+                        classicType.setText("Fast");
                     } else {
-                        classicType.setText("CRAZY");
+                        classicType.setText("Crazy");
                     }
                 }
-                classicType.setPosition(10, stage.getViewport().getWorldHeight() - classicType.getHeight() / 1.5f);
+                classicType.setPosition(10, fitViewport.getWorldHeight()-classicType.getHeight());
                 break;
         }
     }
