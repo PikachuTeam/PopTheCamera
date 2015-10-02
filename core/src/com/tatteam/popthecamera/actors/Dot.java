@@ -91,6 +91,9 @@ public class Dot extends Actor {
     }
 
     public void fadeIn(int type) {
+        if (type == 1) {
+            GDXGameLauncher.touchable = false;
+        }
         this.type = type;
         fadeIn.setAlpha(1);
         fadeIn.setDuration(0.1f);

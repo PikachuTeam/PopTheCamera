@@ -367,6 +367,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 soundButton.setImage("on_sound");
                 SoundHelper.getInstance().playSuccessSound();
             }
+            saveData();
         } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
             if (VibrationHelper.enableVibration) {
                 vibrationButton.setImage("press_vibrate");
@@ -376,6 +377,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 VibrationHelper.enableVibration = true;
                 VibrationHelper.vibrate(1);
             }
+            saveData();
         }
         return false;
     }
@@ -436,7 +438,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         indicationRotation = 360;
                     }
                 }
-
                 if (isSameSide(indicationRotation, dot.getRotation())) {
                     if (indicationRotation >= dot.getRotation()) {
                         delta = indicationRotation - dot.getRotation();
@@ -681,6 +682,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 dot.randomPosition(currentOrientation);
                 break;
         }
+        touchable=true;
         dot.fadeIn(type);
     }
 
@@ -701,7 +703,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 indicator.clockwise = true;
             }
         }
-        touchable = true;
+        touchable=true;
         checkable = true;
     }
 
