@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.tatteam.popthecamera.Constants;
+import com.tatteam.popthecamera.GDXGameLauncher;
 
 /**
  * Created by dongc_000 on 9/25/2015.
@@ -52,6 +53,7 @@ public class CameraButton extends Actor {
     }
 
     public void press() {
+        GDXGameLauncher.touchable = false;
         float defaultX = getX();
         float defaultY = getY();
 

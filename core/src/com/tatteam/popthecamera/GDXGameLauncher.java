@@ -23,7 +23,7 @@ import com.tatteam.popthecamera.actors.TextView;
 
 public class GDXGameLauncher extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, Flash.OnDisappearListener, Dot.OnFadeCompleteListener {
 
-    private Constants.GameMode gameMode = Constants.GameMode.UNLIMITED;
+    private Constants.GameMode gameMode = Constants.GameMode.CLASSIC_SLOW;
     private final int CLASSIC_COLOR_STEP = 3;
     private final int UNLIMITED_COLOR_STEP = 5;
 
@@ -583,6 +583,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     @Override
     public void onDisappear(Flash flash) {
         touchable = true;
+        flash.isAppear=false;
         flash.getParent().removeActor(flash);
         updateTextView(1);
         updateTextView(2);
@@ -677,20 +678,22 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         switch (type) {
             case 1:
                 dot.initPosition();
+                playAgain = false;
                 break;
             case 2:
                 dot.randomPosition(currentOrientation);
                 break;
         }
-        touchable=true;
+        if (!flash.isAppear) {
+            touchable = true;
+        }
         dot.fadeIn(type);
     }
 
     @Override
     public void onFadeInComplete(int type) {
         if (type == 1) {
-            indicator.setRotation(0);
-            playAgain = false;
+            indicator.resetAngle();
             if (gameMode == Constants.GameMode.UNLIMITED) {
                 ColorHelper.getInstance().setColorUnlimitedMode(unlimitedScore, lens2, lens3, lens4);
                 currentBackgroundColor = ColorHelper.getInstance().getBackGroundColorUnlimitedMode(0);
@@ -703,7 +706,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 indicator.clockwise = true;
             }
         }
-        touchable=true;
         checkable = true;
     }
 
