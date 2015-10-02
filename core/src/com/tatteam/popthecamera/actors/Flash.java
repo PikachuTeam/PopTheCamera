@@ -20,6 +20,7 @@ public class Flash extends Actor {
     private AlphaAction alphaAction;
     private float width;
     private float height;
+    public boolean isAppear = false;
 
     public Flash(float width, float height) {
         rectangle = new ShapeRenderer();
@@ -44,8 +45,8 @@ public class Flash extends Actor {
     }
 
     public void appear(Stage stage) {
+        isAppear = true;
         stage.addActor(this);
-        GDXGameLauncher.touchable = false;
         alphaAction.setAlpha(1f);
         alphaAction.setDuration(0.2f);
         addAction(alphaAction);

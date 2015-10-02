@@ -23,7 +23,7 @@ import com.tatteam.popthecamera.actors.TextView;
 
 public class GDXGameLauncher extends ApplicationAdapter implements InputProcessor, ActorGroup.OnShakeCompleteListener, CameraButton.OnPressFinishListener, Flash.OnDisappearListener, Dot.OnFadeCompleteListener {
 
-    private Constants.GameMode gameMode = Constants.GameMode.UNLIMITED;
+    private Constants.GameMode gameMode = Constants.GameMode.CLASSIC_SLOW;
     private final int CLASSIC_COLOR_STEP = 3;
     private final int UNLIMITED_COLOR_STEP = 5;
 
@@ -367,6 +367,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 soundButton.setImage("on_sound");
                 SoundHelper.getInstance().playSuccessSound();
             }
+            saveData();
         } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
             if (VibrationHelper.enableVibration) {
                 vibrationButton.setImage("press_vibrate");
@@ -376,6 +377,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 VibrationHelper.enableVibration = true;
                 VibrationHelper.vibrate(1);
             }
+            saveData();
         }
         return false;
     }
@@ -436,7 +438,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         indicationRotation = 360;
                     }
                 }
-
                 if (isSameSide(indicationRotation, dot.getRotation())) {
                     if (indicationRotation >= dot.getRotation()) {
                         delta = indicationRotation - dot.getRotation();
@@ -582,6 +583,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     @Override
     public void onDisappear(Flash flash) {
         touchable = true;
+        flash.isAppear=false;
         flash.getParent().removeActor(flash);
         updateTextView(1);
         updateTextView(2);
@@ -676,10 +678,14 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         switch (type) {
             case 1:
                 dot.initPosition();
+                playAgain = false;
                 break;
             case 2:
                 dot.randomPosition(currentOrientation);
                 break;
+        }
+        if (!flash.isAppear) {
+            touchable = true;
         }
         dot.fadeIn(type);
     }
@@ -687,8 +693,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     @Override
     public void onFadeInComplete(int type) {
         if (type == 1) {
-            indicator.setRotation(0);
-            playAgain = false;
+            indicator.resetAngle();
             if (gameMode == Constants.GameMode.UNLIMITED) {
                 ColorHelper.getInstance().setColorUnlimitedMode(unlimitedScore, lens2, lens3, lens4);
                 currentBackgroundColor = ColorHelper.getInstance().getBackGroundColorUnlimitedMode(0);
@@ -701,7 +706,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 indicator.clockwise = true;
             }
         }
-        touchable = true;
         checkable = true;
     }
 

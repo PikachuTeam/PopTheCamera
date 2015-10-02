@@ -82,6 +82,7 @@ public class Dot extends Actor {
         setRotation(rotation);
     }
 
+    // type: 1 when win or play again; 2 when dot changes rotation
     public void fadeOut(int type) {
         GDXGameLauncher.touchable = false;
         this.type = type;
