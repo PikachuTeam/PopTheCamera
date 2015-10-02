@@ -1,24 +1,24 @@
 <resources>
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="activity_horizontal_margin">19.2dp</dimen>
+    <dimen name="activity_vertical_margin">19.2dp</dimen>
 
-    <dimen name="mode_game_text_size">40sp</dimen>
-    <dimen name="mode_game_text_size2">52sp</dimen>
-    <dimen name="width_button">230dp</dimen>
-    <dimen name="height_button">65dp</dimen>
-    <dimen name="margin_menu">16dp</dimen>
-    <dimen name="margin_menu2">37dp</dimen>
-    <dimen name="margin_menu3">5dp</dimen>
-    <dimen name="next_button_size">50dp</dimen>
-    <dimen name="card_contentPadding">10dp</dimen>
-    <dimen name="margin_level">5dp</dimen>
-    <dimen name="margin_unlimited">35dp</dimen>
-    <dimen name="margin_flash_screen">50dp</dimen>
-    <dimen name="width_flash_screen">400dp</dimen>
-    <dimen name="height_flash_screen">330dp</dimen>
-    <dimen name="home_image_banner_width">320dp</dimen>
-    <dimen name="home_image_banner_height">200dp</dimen>
-    <dimen name="home_image_banner_margin_top">30dp</dimen>
-    <dimen name="home_image_banner_margin_bottom">15dp</dimen>
+    <dimen name="mode_game_text_size">32sp</dimen>
+    <dimen name="mode_game_text_size2">42sp</dimen>
+    <dimen name="width_button">276dp</dimen>
+    <dimen name="height_button">78dp</dimen>
+    <dimen name="margin_menu">19.2dp</dimen>
+    <dimen name="margin_menu2">44.4dp</dimen>
+    <dimen name="margin_menu3">6dp</dimen>
+    <dimen name="next_button_size">60dp</dimen>
+    <dimen name="card_contentPadding">12dp</dimen>
+    <dimen name="margin_level">6dp</dimen>
+    <dimen name="margin_unlimited">42dp</dimen>
+    <dimen name="margin_flash_screen">60dp</dimen>
+    <dimen name="width_flash_screen">480dp</dimen>
+    <dimen name="height_flash_screen">396dp</dimen>
+    <dimen name="home_image_banner_width">384dp</dimen>
+    <dimen name="home_image_banner_height">240dp</dimen>
+    <dimen name="home_image_banner_margin_top">36dp</dimen>
+    <dimen name="home_image_banner_margin_bottom">18dp</dimen>
     <dimen name="text_padding">0dp</dimen>
 </resources>
