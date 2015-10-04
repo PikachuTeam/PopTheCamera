@@ -1,0 +1,103 @@
+
+pop_the_camera.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+camera
+  rotate: false
+  xy: 1, 1134
+  size: 1012, 905
+  orig: 1012, 905
+  offset: 0, 0
+  index: -1
+lens1
+  rotate: false
+  xy: 1, 354
+  size: 778, 778
+  orig: 778, 778
+  offset: 0, 0
+  index: -1
+lens2
+  rotate: false
+  xy: 1015, 1451
+  size: 588, 588
+  orig: 588, 588
+  offset: 0, 0
+  index: -1
+lens3
+  rotate: false
+  xy: 1605, 1667
+  size: 372, 372
+  orig: 372, 372
+  offset: 0, 0
+  index: -1
+lens4
+  rotate: false
+  xy: 1, 120
+  size: 233, 232
+  orig: 233, 232
+  offset: 0, 0
+  index: -1
+off_sound
+  rotate: false
+  xy: 781, 1015
+  size: 117, 117
+  orig: 117, 117
+  offset: 0, 0
+  index: -1
+off_vibrate
+  rotate: false
+  xy: 1015, 1332
+  size: 117, 117
+  orig: 117, 117
+  offset: 0, 0
+  index: -1
+on_sound
+  rotate: false
+  xy: 1605, 1548
+  size: 117, 117
+  orig: 117, 117
+  offset: 0, 0
+  index: -1
+on_vibrate
+  rotate: false
+  xy: 1, 1
+  size: 117, 117
+  orig: 117, 117
+  offset: 0, 0
+  index: -1
+press_sound
+  rotate: false
+  xy: 236, 235
+  size: 117, 117
+  orig: 117, 117
+  offset: 0, 0
+  index: -1
+press_vibrate
+  rotate: false
+  xy: 781, 896
+  size: 117, 117
+  orig: 117, 117
+  offset: 0, 0
+  index: -1
+camera_button
+  rotate: false
+  xy: 1134, 1421
+  size: 125, 28
+  orig: 125, 28
+  offset: 0, 0
+  index: -1
+dot
+  rotate: false
+  xy: 900, 1061
+  size: 71, 71
+  orig: 71, 71
+  offset: 0, 0
+  index: -1
+indicator
+  rotate: false
+  xy: 1979, 1951
+  size: 25, 88
+  orig: 25, 88
+  offset: 0, 0
+  index: -1

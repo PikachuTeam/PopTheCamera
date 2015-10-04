@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>get-task-allow</key>
+	<true/>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>EW2FZ9628X.*</string>
+	</array>
+	<key>application-identifier</key>
+	<string>EW2FZ9628X.com.tatteam.popthecamera.IOSLauncher</string>
+	<key>com.apple.developer.team-identifier</key>
+	<string>EW2FZ9628X</string>
+</dict>
+</plist>
