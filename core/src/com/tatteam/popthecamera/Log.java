@@ -7,7 +7,7 @@ import com.badlogic.gdx.Gdx;
  */
 public class Log {
 
-    private final static boolean LOG_ENABLE = false;
+    private final static boolean LOG_ENABLE = true;
 
     public static void writeLog(String log) {
         if(LOG_ENABLE) {

@@ -71,6 +71,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     private Background background;
 
     private int classicColorIndex = 0;
+    private float touchOffset;
 
     @Override
     public void create() {
@@ -265,9 +266,9 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             screenViewport.unproject(touchPoint);
             Log.writeLog("Check touch point", "" + touchPoint.x + " " + touchPoint.y);
             Log.writeLog("Sound button coordinate", "" + soundButton.getX() + " " + soundButton.getY());
-            if (touchPoint.x >= soundButton.getX() - Constants.TOUCH_OFFSET && touchPoint.x <= soundButton.getX() + Constants.TOUCH_OFFSET + soundButton.getWidth() && touchPoint.y >= soundButton.getY() - Constants.TOUCH_OFFSET && touchPoint.y <= soundButton.getY() + soundButton.getHeight() + Constants.TOUCH_OFFSET) {
+            if (touchPoint.x >= soundButton.getX() - touchOffset && touchPoint.x <= soundButton.getX() + touchOffset + soundButton.getWidth() && touchPoint.y >= soundButton.getY() - touchOffset && touchPoint.y <= soundButton.getY() + soundButton.getHeight() + touchOffset) {
                 soundButton.setImage("off_sound");
-            } else if (touchPoint.x >= vibrationButton.getX() - Constants.TOUCH_OFFSET && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() + Constants.TOUCH_OFFSET && touchPoint.y >= vibrationButton.getY() - Constants.TOUCH_OFFSET && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight() + Constants.TOUCH_OFFSET) {
+            } else if (touchPoint.x >= vibrationButton.getX() - touchOffset && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() + touchOffset && touchPoint.y >= vibrationButton.getY() - touchOffset && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight() + touchOffset) {
                 vibrationButton.setImage("off_vibrate");
             } else if (playAgain) {
                 dot.fadeOut(1);
@@ -351,7 +352,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         touchPoint.set(screenX, screenY, 0);
         screenViewport.unproject(touchPoint);
-        if (touchPoint.x >= soundButton.getX() - Constants.TOUCH_OFFSET && touchPoint.x <= soundButton.getX() + Constants.TOUCH_OFFSET + soundButton.getWidth() && touchPoint.y >= soundButton.getY() - Constants.TOUCH_OFFSET && touchPoint.y <= soundButton.getY() + soundButton.getHeight() + Constants.TOUCH_OFFSET) {
+        if (touchPoint.x >= soundButton.getX() - touchOffset && touchPoint.x <= soundButton.getX() + touchOffset + soundButton.getWidth() && touchPoint.y >= soundButton.getY() - touchOffset && touchPoint.y <= soundButton.getY() + soundButton.getHeight() + touchOffset) {
             if (SoundHelper.enableSound) {
                 soundButton.setImage("press_sound");
                 SoundHelper.enableSound = false;
@@ -361,7 +362,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 SoundHelper.getInstance().playSuccessSound();
             }
             saveData();
-        } else if (touchPoint.x >= vibrationButton.getX() - Constants.TOUCH_OFFSET && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() + Constants.TOUCH_OFFSET && touchPoint.y >= vibrationButton.getY() - Constants.TOUCH_OFFSET && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight() + Constants.TOUCH_OFFSET) {
+        } else if (touchPoint.x >= vibrationButton.getX() - touchOffset && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() + touchOffset && touchPoint.y >= vibrationButton.getY() - touchOffset && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight() + touchOffset) {
             if (VibrationHelper.enableVibration) {
                 vibrationButton.setImage("press_vibrate");
                 VibrationHelper.enableVibration = false;
@@ -630,6 +631,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         vibrationButton.setSize(vibrationButton.getWidth() / aspectRatio, vibrationButton.getHeight() / aspectRatio);
         vibrationButton.setPosition(soundButton.getX() - 5 * vibrationButton.getWidth() / 4, soundButton.getY());
         vibrationButton.addTo(splashStage);
+
+        touchOffset = soundButton.getWidth() / 4f;
     }
 
     private void loadData() {

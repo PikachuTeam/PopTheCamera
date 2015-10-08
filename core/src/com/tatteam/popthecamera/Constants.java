@@ -17,8 +17,6 @@ public class Constants {
     public final static float CAMERA_BUTTON_PRESS_DURATION = 0.4f;
     public final static float CAMERA_BUTTON_RELEASE_DURATION = 0.25f;
 
-    public final static float TOUCH_OFFSET = 10f;
-
     public static enum GameMode {
         CLASSIC_SLOW(1.0f),
         CLASSIC_MEDIUM(1.6f),
