@@ -4,10 +4,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.tatteam.popthecamera.Constants;
 import com.tatteam.popthecamera.GDXGameLauncher;
+
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
 
 /**
  * Created by dongc_000 on 9/25/2015.
@@ -16,36 +18,10 @@ public class CameraButton extends Actor {
 
     private TextureRegion cameraButton;
     private OnPressFinishListener listener;
-    private MoveToAction press;
-    private MoveToAction release;
 
     public CameraButton(TextureRegion cameraButton) {
         this.cameraButton = new TextureRegion(cameraButton);
         setBounds(getX(), getY(), cameraButton.getRegionWidth(), cameraButton.getRegionHeight());
-        press = new MoveToAction() {
-            @Override
-            public boolean act(float delta) {
-                boolean complete = super.act(delta);
-                if (complete) {
-                    press.reset();
-                }
-                return complete;
-            }
-        };
-
-        release = new MoveToAction() {
-            @Override
-            public boolean act(float delta) {
-                boolean complete = super.act(delta);
-                if (complete) {
-                    if (listener != null) {
-                        listener.onPressFinish();
-                    }
-                    release.reset();
-                }
-                return complete;
-            }
-        };
     }
 
     public void setOnPressFinishListener(OnPressFinishListener listener) {
@@ -57,13 +33,14 @@ public class CameraButton extends Actor {
         float defaultX = getX();
         float defaultY = getY();
 
-        press.setPosition(defaultX, defaultY - 10f);
-        press.setDuration(Constants.CAMERA_BUTTON_PRESS_DURATION);
-
-        release.setPosition(defaultX, defaultY);
-        release.setDuration(Constants.CAMERA_BUTTON_RELEASE_DURATION);
-
-        addAction(new SequenceAction(press, release));
+        addAction(new SequenceAction(moveTo(defaultX, defaultY - 10f, Constants.CAMERA_BUTTON_PRESS_DURATION), moveTo(defaultX, defaultY, Constants.CAMERA_BUTTON_RELEASE_DURATION), run(new Runnable() {
+            @Override
+            public void run() {
+                if (listener != null) {
+                    listener.onPressFinish();
+                }
+            }
+        })));
     }
 
     @Override

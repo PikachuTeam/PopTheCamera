@@ -7,8 +7,8 @@ public class Constants {
 
     public final static String APP_TITLE = "Pop The Camera";
 
-    public final static int DESKTOP_SCREEN_WIDTH =  768; //1152; // 576; 768; 1152
-    public final static int DESKTOP_SCREEN_HEIGHT = 1280; //1920; // 960; 1280; 1920
+    public final static int DESKTOP_SCREEN_WIDTH = 400; //1152; // 576; 768; 1152
+    public final static int DESKTOP_SCREEN_HEIGHT = 700; //1920; // 960; 1280; 1920
 
     public final static float BACKGROUND_ROTATION = 2f;
 
@@ -16,6 +16,8 @@ public class Constants {
 
     public final static float CAMERA_BUTTON_PRESS_DURATION = 0.4f;
     public final static float CAMERA_BUTTON_RELEASE_DURATION = 0.25f;
+
+    public final static float TOUCH_OFFSET = 10f;
 
     public static enum GameMode {
         CLASSIC_SLOW(1.0f),

@@ -47,6 +47,10 @@ public class Button {
         button.setHeight(height);
     }
 
+    public void setSize(float width, float height){
+        button.setSize(width,height);
+    }
+
     public float getX() {
         return button.getX();
     }

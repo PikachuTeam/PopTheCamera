@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
 import com.tatteam.popthecamera.ColorHelper;
-import com.tatteam.popthecamera.GDXGameLauncher;
 
 /**
  * Created by dongc_000 on 9/26/2015.

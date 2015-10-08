@@ -2,8 +2,10 @@ package com.tatteam.popthecamera;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.actions.RotateToAction;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.rotateTo;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 /**
  * Created by dongc_000 on 9/25/2015.
@@ -12,45 +14,9 @@ public class ActorGroup {
 
     private Group actors;
     private OnShakeCompleteListener listener;
-    private RotateToAction action1;
-    private RotateToAction action2;
-    private RotateToAction action3;
 
     public ActorGroup() {
         actors = new Group();
-        action1 = new RotateToAction() {
-            @Override
-            public boolean act(float delta) {
-                boolean complete = super.act(delta);
-                if (complete) {
-                    action1.reset();
-                }
-                return complete;
-            }
-        };
-        action2 = new RotateToAction() {
-            @Override
-            public boolean act(float delta) {
-                boolean complete = super.act(delta);
-                if (complete) {
-                    action2.reset();
-                }
-                return complete;
-            }
-        };
-        action3 = new RotateToAction() {
-            @Override
-            public boolean act(float delta) {
-                boolean complete = super.act(delta);
-                if (complete) {
-                    action3.reset();
-                    if (listener != null) {
-                        listener.onShakeComplete();
-                    }
-                }
-                return complete;
-            }
-        };
     }
 
     public float getY() {
@@ -95,16 +61,16 @@ public class ActorGroup {
     }
 
     public void shake() {
-        action1.setRotation(Constants.BACKGROUND_ROTATION);
-        action1.setDuration(Constants.ROTATION_DURATION);
-
-        action2.setRotation(-Constants.BACKGROUND_ROTATION);
-        action2.setDuration(Constants.ROTATION_DURATION * 2);
-
-        action3.setRotation(0);
-        action3.setDuration(Constants.ROTATION_DURATION);
-
-        actors.addAction(new SequenceAction(action1, action2, action3));
+        actors.addAction(sequence(rotateTo(Constants.BACKGROUND_ROTATION, Constants.ROTATION_DURATION)
+                , rotateTo(-Constants.BACKGROUND_ROTATION, Constants.ROTATION_DURATION * 2)
+                , rotateTo(0, Constants.ROTATION_DURATION), run(new Runnable() {
+            @Override
+            public void run() {
+                if (listener != null) {
+                    listener.onShakeComplete();
+                }
+            }
+        })));
     }
 
     public interface OnShakeCompleteListener {

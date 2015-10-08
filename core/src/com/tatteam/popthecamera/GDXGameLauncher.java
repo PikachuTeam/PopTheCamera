@@ -89,7 +89,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         stage.setViewport(fitViewport);
 
         screenViewport = new ScreenViewport();
-        screenViewport.update(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), true);
+        screenViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         splashStage.setViewport(screenViewport);
 
         backgroundViewport = new ScreenViewport();
@@ -262,12 +262,12 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (touchable) {
             touchPoint.set(screenX, screenY, 0);
-            fitViewport.unproject(touchPoint);
+            screenViewport.unproject(touchPoint);
             Log.writeLog("Check touch point", "" + touchPoint.x + " " + touchPoint.y);
             Log.writeLog("Sound button coordinate", "" + soundButton.getX() + " " + soundButton.getY());
-            if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
+            if (touchPoint.x >= soundButton.getX() - Constants.TOUCH_OFFSET && touchPoint.x <= soundButton.getX() + Constants.TOUCH_OFFSET + soundButton.getWidth() && touchPoint.y >= soundButton.getY() - Constants.TOUCH_OFFSET && touchPoint.y <= soundButton.getY() + soundButton.getHeight() + Constants.TOUCH_OFFSET) {
                 soundButton.setImage("off_sound");
-            } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
+            } else if (touchPoint.x >= vibrationButton.getX() - Constants.TOUCH_OFFSET && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() + Constants.TOUCH_OFFSET && touchPoint.y >= vibrationButton.getY() - Constants.TOUCH_OFFSET && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight() + Constants.TOUCH_OFFSET) {
                 vibrationButton.setImage("off_vibrate");
             } else if (playAgain) {
                 dot.fadeOut(1);
@@ -339,13 +339,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         }
 
                     } else {
-                        Log.writeLog("Check touch");
-                        Log.writeLog("Indicator Rotation", "" + indicationRotation);
-                        Log.writeLog("Dot Rotation", "" + dot.getRotation());
-                        Log.writeLog("Delta 2", "" + delta);
-                        Log.writeLog("Dot beta", "" + dotBeta / 2);
-                        Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
-                        Log.writeLog("Tach.");
                         stopGame(2);
                     }
                 }
@@ -357,8 +350,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         touchPoint.set(screenX, screenY, 0);
-        fitViewport.unproject(touchPoint);
-        if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
+        screenViewport.unproject(touchPoint);
+        if (touchPoint.x >= soundButton.getX() - Constants.TOUCH_OFFSET && touchPoint.x <= soundButton.getX() + Constants.TOUCH_OFFSET + soundButton.getWidth() && touchPoint.y >= soundButton.getY() - Constants.TOUCH_OFFSET && touchPoint.y <= soundButton.getY() + soundButton.getHeight() + Constants.TOUCH_OFFSET) {
             if (SoundHelper.enableSound) {
                 soundButton.setImage("press_sound");
                 SoundHelper.enableSound = false;
@@ -368,7 +361,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 SoundHelper.getInstance().playSuccessSound();
             }
             saveData();
-        } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
+        } else if (touchPoint.x >= vibrationButton.getX() - Constants.TOUCH_OFFSET && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() + Constants.TOUCH_OFFSET && touchPoint.y >= vibrationButton.getY() - Constants.TOUCH_OFFSET && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight() + Constants.TOUCH_OFFSET) {
             if (VibrationHelper.enableVibration) {
                 vibrationButton.setImage("press_vibrate");
                 VibrationHelper.enableVibration = false;
@@ -583,7 +576,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     @Override
     public void onDisappear(Flash flash) {
         touchable = true;
-        flash.isAppear=false;
+        flash.isAppear = false;
         flash.getParent().removeActor(flash);
         updateTextView(1);
         updateTextView(2);
@@ -608,27 +601,35 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         stage.addActor(level);
         stage.addActor(index);
-        stage.addActor(classicType);
+        splashStage.addActor(classicType);
 
         level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 3.5f - level.getHeight());
         index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2, 3 * stage.getViewport().getWorldHeight() / 4 + 1.5f * index.getHeight());
     }
 
     private void initButton() {
+
+        float widthAspectRatio = fitViewport.getWorldWidth() / screenViewport.getWorldWidth();
+        float heightAspectRatio = fitViewport.getWorldHeight() / screenViewport.getWorldHeight();
+        float aspectRatio = (widthAspectRatio > heightAspectRatio) ? widthAspectRatio : heightAspectRatio;
+
+
         if (SoundHelper.enableSound) {
             soundButton = new Button(atlas, "on_sound");
         } else {
             soundButton = new Button(atlas, "press_sound");
         }
-        soundButton.setPosition(fitViewport.getWorldWidth() - soundButton.getWidth() * 1.25f, fitViewport.getWorldHeight() - soundButton.getHeight() * 1.25f);
-        soundButton.addTo(stage);
+        soundButton.setSize(soundButton.getWidth() / aspectRatio, soundButton.getHeight() / aspectRatio);
+        soundButton.setPosition(screenViewport.getWorldWidth() - soundButton.getWidth() * 1.25f, screenViewport.getWorldHeight() - soundButton.getHeight() * 1.25f);
+        soundButton.addTo(splashStage);
         if (VibrationHelper.enableVibration) {
             vibrationButton = new Button(atlas, "on_vibrate");
         } else {
             vibrationButton = new Button(atlas, "press_vibrate");
         }
+        vibrationButton.setSize(vibrationButton.getWidth() / aspectRatio, vibrationButton.getHeight() / aspectRatio);
         vibrationButton.setPosition(soundButton.getX() - 5 * vibrationButton.getWidth() / 4, soundButton.getY());
-        vibrationButton.addTo(stage);
+        vibrationButton.addTo(splashStage);
     }
 
     private void loadData() {
@@ -755,7 +756,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         classicType.setText("Crazy");
                     }
                 }
-                classicType.setPosition(fitViewport.getWorldWidth() - (soundButton.getX() + soundButton.getWidth()), fitViewport.getWorldHeight() - classicType.getHeight());
+                classicType.setPosition(screenViewport.getWorldWidth() - (soundButton.getX() + soundButton.getWidth()), screenViewport.getWorldHeight() - classicType.getHeight() / 2);
                 break;
         }
     }
