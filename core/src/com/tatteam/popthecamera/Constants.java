@@ -26,7 +26,7 @@ public class Constants {
 
         public static final int UNLIMITED_INCREASING_POINT = 1;
         public static final float UNLIMITED_MAX_SPEED = CLASSIC_CRAZY.getSpeed();
-        public static final float UNLIMITED_INCREASING_SPEED = 0.015f;
+        public static final float UNLIMITED_INCREASING_SPEED = 0.02f;
 
         private float speed;
 

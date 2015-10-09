@@ -75,6 +75,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
     @Override
     public void create() {
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         touchable = true;
         loadData();
 

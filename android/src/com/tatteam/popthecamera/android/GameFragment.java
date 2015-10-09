@@ -72,24 +72,24 @@ public class GameFragment extends AndroidFragmentApplication implements GDXGameL
             return;
         lossGameCounter++;
         if (gameMode == Constants.GameMode.UNLIMITED) {
-            if (lossGameCounter % 5 == 0) {
+            if (lossGameCounter % 3 == 0) {
                 displayAds();
             }
         } else {
             if (gameMode == Constants.GameMode.CLASSIC_SLOW) {
-                if (currentLevel >= 5 && lossGameCounter % 4 == 0) {
+                if (currentLevel >= 4 && lossGameCounter % 3 == 0) {
                     displayAds();
                 }
             } else if (gameMode == Constants.GameMode.CLASSIC_MEDIUM) {
-                if (currentLevel >= 3 && lossGameCounter % 6 == 0) {
+                if (currentLevel >= 4 && lossGameCounter % 3 == 0) {
                     displayAds();
                 }
             } else if (gameMode == Constants.GameMode.CLASSIC_FAST) {
-                if (lossGameCounter % 6 == 0) {
+                if (currentLevel >= 4 && lossGameCounter % 4 == 0) {
                     displayAds();
                 }
             } else if (gameMode == Constants.GameMode.CLASSIC_CRAZY) {
-                if (lossGameCounter % 8 == 0) {
+                if (currentLevel >= 4 && lossGameCounter % 4 == 0) {
                     displayAds();
                 }
             }
