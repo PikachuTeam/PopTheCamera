@@ -782,7 +782,9 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         classicType.setText("Crazy");
                     }
                 }
-                classicType.setPosition(screenViewport.getWorldWidth() - (soundButton.getX() + soundButton.getWidth()), screenViewport.getWorldHeight() - classicType.getHeight() / 2);
+                float aspectRatio = screenViewport.getWorldHeight() / fitViewport.getWorldHeight();
+                classicType.setScale(aspectRatio, aspectRatio);
+                classicType.setPosition(screenViewport.getWorldWidth() - (soundButton.getX() + soundButton.getWidth()), soundButton.getY() + soundButton.getHeight() / 2);
                 break;
         }
     }
