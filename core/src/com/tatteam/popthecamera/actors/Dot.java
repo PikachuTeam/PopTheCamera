@@ -4,10 +4,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
 import com.tatteam.popthecamera.GDXGameLauncher;
 
 import java.util.Random;
+
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.alpha;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 /**
  * Created by dongc_000 on 9/24/2015.
@@ -17,40 +20,12 @@ public class Dot extends Actor {
     private TextureRegion dot;
     private Random random;
     private OnFadeCompleteListener listener;
-    private AlphaAction fadeIn;
-    private AlphaAction fadeOut;
     private int type;
 
     public Dot(TextureRegion dot) {
         this.dot = new TextureRegion(dot);
         setBounds(getX(), getY(), this.dot.getRegionWidth(), this.dot.getRegionHeight());
         random = new Random();
-        fadeIn = new AlphaAction() {
-            @Override
-            public boolean act(float delta) {
-                boolean complete = super.act(delta);
-                if (complete) {
-                    if (listener != null) {
-                        listener.onFadeInComplete(type);
-                    }
-                    fadeIn.reset();
-                }
-                return complete;
-            }
-        };
-        fadeOut = new AlphaAction() {
-            @Override
-            public boolean act(float delta) {
-                boolean complete = super.act(delta);
-                if (complete) {
-                    if (listener != null) {
-                        listener.onFadeOutComplete(type);
-                    }
-                    fadeOut.reset();
-                }
-                return complete;
-            }
-        };
     }
 
     public void setOnFadeCompleteListener(OnFadeCompleteListener listener) {
@@ -86,16 +61,26 @@ public class Dot extends Actor {
     public void fadeOut(int type) {
         GDXGameLauncher.touchable = false;
         this.type = type;
-        fadeOut.setAlpha(0f);
-        fadeOut.setDuration(0.15f);
-        addAction(fadeOut);
+        addAction(sequence(alpha(0f, 0.15f), run(new Runnable() {
+            @Override
+            public void run() {
+                if (listener != null) {
+                    listener.onFadeOutComplete(Dot.this.type);
+                }
+            }
+        })));
     }
 
     public void fadeIn(int type) {
         this.type = type;
-        fadeIn.setAlpha(1);
-        fadeIn.setDuration(0.1f);
-        addAction(fadeIn);
+        addAction(sequence(alpha(1, 0.1f), run(new Runnable() {
+            @Override
+            public void run() {
+                if (listener != null) {
+                    listener.onFadeInComplete(Dot.this.type);
+                }
+            }
+        })));
     }
 
     @Override

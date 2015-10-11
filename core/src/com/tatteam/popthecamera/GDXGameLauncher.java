@@ -57,6 +57,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     private Color currentBackgroundColor;
     private Button soundButton;
     private Button vibrationButton;
+    private Button backButton;
     private Vector3 touchPoint;
     private Preferences preferences;
     private boolean currentOrientation = true;
@@ -71,9 +72,11 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     private Background background;
 
     private int classicColorIndex = 0;
+    private float touchOffset;
 
     @Override
     public void create() {
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         touchable = true;
         loadData();
 
@@ -89,7 +92,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         stage.setViewport(fitViewport);
 
         screenViewport = new ScreenViewport();
-        screenViewport.update(AssetsLoader.getInstance().getViewPortSize().getWidth(), AssetsLoader.getInstance().getViewPortSize().getHeight(), true);
+        screenViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         splashStage.setViewport(screenViewport);
 
         backgroundViewport = new ScreenViewport();
@@ -262,18 +265,24 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (touchable) {
             touchPoint.set(screenX, screenY, 0);
-            fitViewport.unproject(touchPoint);
+            screenViewport.unproject(touchPoint);
             Log.writeLog("Check touch point", "" + touchPoint.x + " " + touchPoint.y);
             Log.writeLog("Sound button coordinate", "" + soundButton.getX() + " " + soundButton.getY());
-            if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
+            if (touchPoint.x >= soundButton.getX() - touchOffset && touchPoint.x <= soundButton.getX() + touchOffset + soundButton.getWidth() && touchPoint.y >= soundButton.getY() - touchOffset && touchPoint.y <= soundButton.getY() + soundButton.getHeight() + touchOffset) {
+                soundButton.touched = true;
                 soundButton.setImage("off_sound");
-            } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
+            } else if (touchPoint.x >= vibrationButton.getX() - touchOffset && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() + touchOffset && touchPoint.y >= vibrationButton.getY() - touchOffset && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight() + touchOffset) {
+                vibrationButton.touched = true;
                 vibrationButton.setImage("off_vibrate");
+            } else if (touchPoint.x >= backButton.getX()- touchOffset && touchPoint.x <= backButton.getX() + backButton.getWidth()+ touchOffset && touchPoint.y >= backButton.getY()- touchOffset && touchPoint.y <= backButton.getY() + backButton.getHeight()+ touchOffset) {
+                backButton.touched = true;
+                backButton.setImage("btn_back_pressed");
             } else if (playAgain) {
                 dot.fadeOut(1);
                 indicator.fadeOut();
                 updateTextView(2);
                 checkable = false;
+                backButton.setVisible(false);
             } else {
                 if (!indicator.isMoving) {
                     indicator.isMoving = true;
@@ -339,13 +348,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         }
 
                     } else {
-                        Log.writeLog("Check touch");
-                        Log.writeLog("Indicator Rotation", "" + indicationRotation);
-                        Log.writeLog("Dot Rotation", "" + dot.getRotation());
-                        Log.writeLog("Delta 2", "" + delta);
-                        Log.writeLog("Dot beta", "" + dotBeta / 2);
-                        Log.writeLog("Indicator beta", "" + indicatorBeta / 8);
-                        Log.writeLog("Tach.");
                         stopGame(2);
                     }
                 }
@@ -357,8 +359,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         touchPoint.set(screenX, screenY, 0);
-        fitViewport.unproject(touchPoint);
-        if (touchPoint.x >= soundButton.getX() && touchPoint.x <= soundButton.getX() + soundButton.getWidth() && touchPoint.y >= soundButton.getY() && touchPoint.y <= soundButton.getY() + soundButton.getHeight()) {
+        screenViewport.unproject(touchPoint);
+        if (soundButton.touched) {
             if (SoundHelper.enableSound) {
                 soundButton.setImage("press_sound");
                 SoundHelper.enableSound = false;
@@ -368,7 +370,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 SoundHelper.getInstance().playSuccessSound();
             }
             saveData();
-        } else if (touchPoint.x >= vibrationButton.getX() && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() && touchPoint.y >= vibrationButton.getY() && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight()) {
+            soundButton.reset();
+        } else if (vibrationButton.touched) {
             if (VibrationHelper.enableVibration) {
                 vibrationButton.setImage("press_vibrate");
                 VibrationHelper.enableVibration = false;
@@ -378,6 +381,13 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 VibrationHelper.vibrate(1);
             }
             saveData();
+            vibrationButton.reset();
+        } else if (backButton.touched) {
+            backButton.reset();
+            backButton.setImage("btn_back");
+            if (onGameListener != null) {
+                onGameListener.onGameBackPressed();
+            }
         }
         return false;
     }
@@ -413,6 +423,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             case 2:
                 playAgain = true;
                 cameraGroup.shake();
+                backButton.setVisible(true);
                 SoundHelper.getInstance().playFailSound();
                 touchable = false;
                 VibrationHelper.vibrate(1);
@@ -583,7 +594,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
     @Override
     public void onDisappear(Flash flash) {
         touchable = true;
-        flash.isAppear=false;
+        flash.isAppear = false;
         flash.getParent().removeActor(flash);
         updateTextView(1);
         updateTextView(2);
@@ -608,27 +619,43 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         stage.addActor(level);
         stage.addActor(index);
-        stage.addActor(classicType);
+        splashStage.addActor(classicType);
 
         level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 3.5f - level.getHeight());
         index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2, 3 * stage.getViewport().getWorldHeight() / 4 + 1.5f * index.getHeight());
     }
 
     private void initButton() {
+
+        float widthAspectRatio = fitViewport.getWorldWidth() / screenViewport.getWorldWidth();
+        float heightAspectRatio = fitViewport.getWorldHeight() / screenViewport.getWorldHeight();
+        float aspectRatio = (widthAspectRatio > heightAspectRatio) ? widthAspectRatio : heightAspectRatio;
+
         if (SoundHelper.enableSound) {
             soundButton = new Button(atlas, "on_sound");
         } else {
             soundButton = new Button(atlas, "press_sound");
         }
-        soundButton.setPosition(fitViewport.getWorldWidth() - soundButton.getWidth() * 1.25f, fitViewport.getWorldHeight() - soundButton.getHeight() * 1.25f);
-        soundButton.addTo(stage);
+        soundButton.setSize(soundButton.getWidth() / aspectRatio, soundButton.getHeight() / aspectRatio);
+        soundButton.setPosition(screenViewport.getWorldWidth() - soundButton.getWidth() * 1.25f, screenViewport.getWorldHeight() - soundButton.getHeight() * 1.25f);
+        soundButton.addTo(splashStage);
+
         if (VibrationHelper.enableVibration) {
             vibrationButton = new Button(atlas, "on_vibrate");
         } else {
             vibrationButton = new Button(atlas, "press_vibrate");
         }
+        vibrationButton.setSize(vibrationButton.getWidth() / aspectRatio, vibrationButton.getHeight() / aspectRatio);
         vibrationButton.setPosition(soundButton.getX() - 5 * vibrationButton.getWidth() / 4, soundButton.getY());
-        vibrationButton.addTo(stage);
+        vibrationButton.addTo(splashStage);
+
+        backButton = new Button(atlas, "btn_back");
+        backButton.setSize(backButton.getWidth() / aspectRatio, backButton.getHeight() / aspectRatio);
+        backButton.setPosition(backButton.getWidth() / 4, backButton.getHeight() / 4);
+        backButton.addTo(splashStage);
+        backButton.setVisible(false);
+
+        touchOffset = soundButton.getWidth() / 4f;
     }
 
     private void loadData() {
@@ -755,7 +782,9 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                         classicType.setText("Crazy");
                     }
                 }
-                classicType.setPosition(fitViewport.getWorldWidth() - (soundButton.getX() + soundButton.getWidth()), fitViewport.getWorldHeight() - classicType.getHeight());
+                float aspectRatio = screenViewport.getWorldHeight() / fitViewport.getWorldHeight();
+                classicType.setScale(aspectRatio, aspectRatio);
+                classicType.setPosition(screenViewport.getWorldWidth() - (soundButton.getX() + soundButton.getWidth()), soundButton.getY() + soundButton.getHeight() / 2);
                 break;
         }
     }
@@ -794,5 +823,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
     public static interface OnGameListener {
         public void onLossGame(GDXGameLauncher gameLauncher, Constants.GameMode gameMode, int currentLevel, int score);
+
+        void onGameBackPressed();
     }
 }

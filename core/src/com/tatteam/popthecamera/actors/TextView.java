@@ -42,6 +42,15 @@ public class TextView extends Actor {
         layout.setText(font, text);
     }
 
+    public BitmapFont getBitMapFont() {
+        return font;
+    }
+
+    @Override
+    public void setScale(float scaleX, float scaleY) {
+        font.getData().setScale(scaleX, scaleY);
+    }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         font.draw(batch, text, getX(), getY());
