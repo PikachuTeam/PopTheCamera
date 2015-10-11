@@ -282,6 +282,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 indicator.fadeOut();
                 updateTextView(2);
                 checkable = false;
+                backButton.setVisible(false);
             } else {
                 if (!indicator.isMoving) {
                     indicator.isMoving = true;
@@ -422,6 +423,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             case 2:
                 playAgain = true;
                 cameraGroup.shake();
+                backButton.setVisible(true);
                 SoundHelper.getInstance().playFailSound();
                 touchable = false;
                 VibrationHelper.vibrate(1);
@@ -651,6 +653,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         backButton.setSize(backButton.getWidth() / aspectRatio, backButton.getHeight() / aspectRatio);
         backButton.setPosition(backButton.getWidth() / 4, backButton.getHeight() / 4);
         backButton.addTo(splashStage);
+        backButton.setVisible(false);
 
         touchOffset = soundButton.getWidth() / 4f;
     }

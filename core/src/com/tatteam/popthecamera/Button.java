@@ -75,6 +75,10 @@ public class Button {
     public void reset() {
         touched = false;
     }
+
+    public void setVisible(boolean visible) {
+        button.setVisible(visible);
+    }
 }
 
 
