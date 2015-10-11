@@ -12,6 +12,7 @@ public class Button {
 
     private ImageButton button;
     private Skin buttonSkin;
+    public boolean touched;
 
     public Button(TextureAtlas buttonTexturePacker, String imageName) {
         buttonSkin = new Skin();
@@ -20,7 +21,7 @@ public class Button {
 
         button.setWidth(buttonTexturePacker.findRegion(imageName).getRegionWidth());
         button.setWidth(buttonTexturePacker.findRegion(imageName).getRegionHeight());
-
+        touched = false;
     }
 
     public void addTo(Stage stage) {
@@ -47,8 +48,8 @@ public class Button {
         button.setHeight(height);
     }
 
-    public void setSize(float width, float height){
-        button.setSize(width,height);
+    public void setSize(float width, float height) {
+        button.setSize(width, height);
     }
 
     public float getX() {
@@ -70,5 +71,10 @@ public class Button {
     public void dispose() {
         buttonSkin.dispose();
     }
+
+    public void reset() {
+        touched = false;
+    }
 }
+
 

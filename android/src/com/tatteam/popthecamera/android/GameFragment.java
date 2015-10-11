@@ -67,6 +67,11 @@ public class GameFragment extends AndroidFragmentApplication implements GDXGameL
         displayAdsIfNeeded(gameMode, currentLevel, score);
     }
 
+    @Override
+    public void onGameBackPressed() {
+        getFragmentManager().popBackStack();
+    }
+
     private void displayAdsIfNeeded(Constants.GameMode gameMode, int currentLevel, int score) {
         if (!MainActivity.ADS_ENABLE)
             return;

@@ -7,8 +7,8 @@ public class Constants {
 
     public final static String APP_TITLE = "Pop The Camera";
 
-    public final static int DESKTOP_SCREEN_WIDTH = 400; //1152; // 576; 768; 1152
-    public final static int DESKTOP_SCREEN_HEIGHT = 700; //1920; // 960; 1280; 1920
+    public final static int DESKTOP_SCREEN_WIDTH = 1152; //1152; // 576; 768; 1152
+    public final static int DESKTOP_SCREEN_HEIGHT = 1920; //1920; // 960; 1280; 1920
 
     public final static float BACKGROUND_ROTATION = 2f;
 
