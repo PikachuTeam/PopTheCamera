@@ -274,7 +274,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             } else if (touchPoint.x >= vibrationButton.getX() - touchOffset && touchPoint.x <= vibrationButton.getX() + vibrationButton.getWidth() + touchOffset && touchPoint.y >= vibrationButton.getY() - touchOffset && touchPoint.y <= vibrationButton.getY() + vibrationButton.getHeight() + touchOffset) {
                 vibrationButton.touched = true;
                 vibrationButton.setImage("off_vibrate");
-            } else if (touchPoint.x >= backButton.getX()- touchOffset && touchPoint.x <= backButton.getX() + backButton.getWidth()+ touchOffset && touchPoint.y >= backButton.getY()- touchOffset && touchPoint.y <= backButton.getY() + backButton.getHeight()+ touchOffset) {
+            } else if (touchPoint.x >= backButton.getX() - touchOffset && touchPoint.x <= backButton.getX() + backButton.getWidth() + touchOffset && touchPoint.y >= backButton.getY() - touchOffset && touchPoint.y <= backButton.getY() + backButton.getHeight() + touchOffset) {
                 backButton.touched = true;
                 backButton.setImage("btn_back_pressed");
             } else if (playAgain) {
@@ -819,6 +819,20 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                 indicator.setSpeed(gameMode.getUnlimitedNewSpeed());
             }
         }
+    }
+
+    public void reset() {
+        touchable = true;
+        loadData();
+
+        dot.initPosition();
+        if (dot.getRotation() >= 0 && dot.getRotation() <= 180) {
+            indicator.clockwise = false;
+        } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
+            indicator.clockwise = true;
+        }
+
+        initTextView();
     }
 
     public static interface OnGameListener {
