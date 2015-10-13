@@ -823,6 +823,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
     public void reset() {
         touchable = true;
+        playAgain = false;
+        checkable = true;
         loadData();
 
         dot.initPosition();
