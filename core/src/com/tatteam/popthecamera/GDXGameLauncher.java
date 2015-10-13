@@ -384,6 +384,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             vibrationButton.reset();
         } else if (backButton.touched) {
             backButton.reset();
+            reset();
             backButton.setImage("btn_back");
             if (onGameListener != null) {
                 onGameListener.onGameBackPressed();
@@ -833,6 +834,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         } else if (dot.getRotation() > 180 && dot.getRotation() < 360) {
             indicator.clockwise = true;
         }
+
+        indicator.resetAngle();
 
         initTextView();
     }
