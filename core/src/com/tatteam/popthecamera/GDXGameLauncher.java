@@ -384,7 +384,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             vibrationButton.reset();
         } else if (backButton.touched) {
             backButton.reset();
-            reset();
             backButton.setImage("btn_back");
             if (onGameListener != null) {
                 onGameListener.onGameBackPressed();
@@ -621,9 +620,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         stage.addActor(level);
         stage.addActor(index);
         splashStage.addActor(classicType);
-
-        level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 3.5f - level.getHeight());
-        index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2, 3 * stage.getViewport().getWorldHeight() / 4 + 1.5f * index.getHeight());
     }
 
     private void initButton() {
@@ -746,15 +742,14 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                     } else {
                         level.setText("My Best: 999+");
                     }
-                    level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
                 } else {
                     if (classicLevel <= 999) {
                         level.setText("Level: " + classicLevel);
                     } else {
                         level.setText("Level: 999+");
                     }
-                    level.setX(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2);
                 }
+                level.setPosition(stage.getViewport().getWorldWidth() / 2 - level.getWidth() / 2, stage.getViewport().getWorldHeight() / 3.5f - level.getHeight());
                 break;
             case 2://update Index
                 if (gameMode == Constants.GameMode.UNLIMITED) {
@@ -766,8 +761,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
                     }
                 } else {
                     index.setText("" + classicScore);
-                    index.setX(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2);
                 }
+                index.setPosition(stage.getViewport().getWorldWidth() / 2 - index.getWidth() / 2, 3 * stage.getViewport().getWorldHeight() / 4 + 1.5f * index.getHeight());
                 break;
             case 3:
                 if (gameMode == Constants.GameMode.UNLIMITED) {
@@ -837,7 +832,9 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         indicator.resetAngle();
 
-        initTextView();
+        updateTextView(1);
+        updateTextView(2);
+        updateTextView(3);
     }
 
     public static interface OnGameListener {
