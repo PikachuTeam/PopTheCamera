@@ -104,13 +104,6 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         atlas = new TextureAtlas(Gdx.files.internal(AssetsLoader.getInstance().getImagePath() + "pop_the_camera.pack"));
 
-        if (gameMode == Constants.GameMode.UNLIMITED) {
-            ColorHelper.getInstance().initColor();
-            currentBackgroundColor = ColorHelper.getInstance().getBackGroundColorUnlimitedMode(unlimitedScore);
-        } else {
-            ColorHelper.getInstance().initColor();
-            currentBackgroundColor = ColorHelper.getInstance().getBackgroundColor(classicColorIndex);
-        }
         background = new Background(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         backgroundStage.addActor(background);
 
@@ -660,8 +653,12 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
 
         SoundHelper.enableSound = preferences.getBoolean("sound", true);
         VibrationHelper.enableVibration = preferences.getBoolean("vibration", true);
+
+        ColorHelper.getInstance().initColor();
+
         if (gameMode == Constants.GameMode.UNLIMITED) {
             unlimitedBestScore = preferences.getInteger("unlimited_best_score", 0);
+            currentBackgroundColor = ColorHelper.getInstance().getBackGroundColorUnlimitedMode(unlimitedScore);
         } else {
             if (gameMode == Constants.GameMode.CLASSIC_SLOW) {
                 classicLevel = preferences.getInteger("classic_slow", 1);
@@ -674,6 +671,7 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
             }
             classicScore = classicLevel;
             classicColorIndex = classicLevel / CLASSIC_COLOR_STEP;
+            currentBackgroundColor = ColorHelper.getInstance().getBackgroundColor(classicColorIndex);
         }
     }
 
@@ -831,6 +829,8 @@ public class GDXGameLauncher extends ApplicationAdapter implements InputProcesso
         }
 
         indicator.resetAngle();
+
+        backButton.setVisible(false);
 
         updateTextView(1);
         updateTextView(2);

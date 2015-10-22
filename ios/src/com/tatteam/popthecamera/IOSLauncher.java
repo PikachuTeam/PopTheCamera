@@ -60,8 +60,6 @@ public class IOSLauncher extends IOSApplication.Delegate  implements GDXGameLaun
             menuViewController.setApp(this);
             rootViewController = app.getUIWindow().getRootViewController();
             rootViewController.presentViewController(menuViewController,false,null);
-
-
         }
 
         setupAds();

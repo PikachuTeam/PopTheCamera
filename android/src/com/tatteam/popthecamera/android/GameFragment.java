@@ -28,6 +28,8 @@ public class GameFragment extends AndroidFragmentApplication implements GDXGameL
 
     private Handler handler;
 
+    private GDXGameLauncher gameLauncher;
+
     private InterstitialAd interstitialAd;
     private int lossGameCounter;
 
@@ -38,7 +40,7 @@ public class GameFragment extends AndroidFragmentApplication implements GDXGameL
         setupAds();
 
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        GDXGameLauncher gameLauncher = new GDXGameLauncher();
+        gameLauncher = new GDXGameLauncher();
         gameLauncher.setOnGameListener(this);
         Bundle bundle = this.getArguments();
         int gameMode = bundle.getInt(KEY_GAME_MODE, GAME_MODE_CLASSIC_MEDIUM);
