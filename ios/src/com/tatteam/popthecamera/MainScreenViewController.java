@@ -93,7 +93,7 @@ public class MainScreenViewController extends UIViewController {
             public void onTouchUpInside (UIControl control, UIEvent event) {
                 if (gameLauncher != null){
                     gameLauncher.setGameMode(getClassicGameMode());
-//                    gameLauncher.reset();
+                    gameLauncher.reset();
                     dismissViewController(true,null);
 
                 }
