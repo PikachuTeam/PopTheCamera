@@ -3,22 +3,25 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="mode_game_text_size">40sp</dimen>
-    <dimen name="mode_game_text_size2">52sp</dimen>
+    <dimen name="mode_game_text_size2">47sp</dimen>
     <dimen name="width_button">230dp</dimen>
-    <dimen name="height_button">65dp</dimen>
+    <dimen name="height_button">60dp</dimen>
     <dimen name="margin_menu">16dp</dimen>
     <dimen name="margin_menu2">37dp</dimen>
     <dimen name="margin_menu3">5dp</dimen>
     <dimen name="next_button_size">50dp</dimen>
     <dimen name="card_contentPadding">10dp</dimen>
     <dimen name="margin_level">5dp</dimen>
-    <dimen name="margin_unlimited">35dp</dimen>
+    <dimen name="margin_unlimited">20dp</dimen>
     <dimen name="margin_flash_screen">50dp</dimen>
     <dimen name="width_flash_screen">400dp</dimen>
     <dimen name="height_flash_screen">330dp</dimen>
     <dimen name="home_image_banner_width">320dp</dimen>
     <dimen name="home_image_banner_height">200dp</dimen>
-    <dimen name="home_image_banner_margin_top">30dp</dimen>
+    <dimen name="home_image_banner_margin_top">25dp</dimen>
     <dimen name="home_image_banner_margin_bottom">15dp</dimen>
     <dimen name="text_padding">0dp</dimen>
+
+    <dimen name="more_app_text_size">25dp</dimen>
+    <dimen name="button_more_app_margin">10dp</dimen>
 </resources>

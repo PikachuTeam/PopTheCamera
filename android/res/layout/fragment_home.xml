@@ -14,11 +14,11 @@
         android:src="@drawable/home_banner" />
 
     <LinearLayout
+        android:id="@+id/buttonContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/img_banner"
         android:layout_centerHorizontal="true"
-
         android:orientation="vertical">
 
         <LinearLayout
@@ -106,6 +106,34 @@
                 android:textColor="@color/text_button"
                 android:textSize="@dimen/mode_game_text_size2" />
         </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/btn_more_apps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/adView"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/buttonContainer"
+        android:layout_marginBottom="@dimen/button_more_app_margin"
+        android:layout_marginRight="@dimen/button_more_app_margin"
+        android:layout_marginTop="@dimen/button_more_app_margin"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_shop" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/button_more_app_margin"
+            android:text="@string/more_app"
+            android:textSize="@dimen/more_app_text_size"
+            android:textStyle="italic" />
     </LinearLayout>
 
     <com.google.android.gms.ads.AdView
