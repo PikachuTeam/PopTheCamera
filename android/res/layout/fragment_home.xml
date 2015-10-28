@@ -109,40 +109,45 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/btn_more_apps"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/adView"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/buttonContainer"
-        android:layout_marginBottom="@dimen/button_more_app_margin"
-        android:layout_marginRight="@dimen/button_more_app_margin"
-        android:layout_marginTop="@dimen/button_more_app_margin"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_shop" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/button_more_app_margin"
-            android:text="@string/more_app"
-            android:textSize="@dimen/more_app_text_size"
-            android:textStyle="italic" />
-    </LinearLayout>
-
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        ads:adSize="SMART_BANNER"
-        ads:adUnitId="@string/small_banner_ad_unit_id" />
+        android:orientation="vertical">
 
+
+        <LinearLayout
+            android:id="@+id/btn_more_apps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginBottom="@dimen/button_more_app_margin"
+            android:layout_marginRight="@dimen/button_more_app_margin"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/more_app_image_size"
+                android:layout_height="@dimen/more_app_image_size"
+                android:src="@drawable/ic_shop" />
+
+            <TextView
+                android:id="@+id/tv_more_app"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/more_app_text_margin"
+                android:text="@string/more_app"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/more_app_text_size"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            ads:adSize="SMART_BANNER"
+            ads:adUnitId="@string/small_banner_ad_unit_id" />
+    </LinearLayout>
 </RelativeLayout>

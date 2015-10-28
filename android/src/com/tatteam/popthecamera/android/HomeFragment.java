@@ -2,6 +2,7 @@ package com.tatteam.popthecamera.android;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -25,8 +27,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private AdView mAdView;
     private View btnClassicalMode;
     private View btnUnlimitedMode;
-    private View btnNext, btnPre;
-    private TextView tvLevel,tvClassicMode, tvtUnlimitedMode;
+    private View btnNext, btnPre, btnMoreApp;
+    private TextView tvLevel, tvClassicMode, tvtUnlimitedMode, tvMoreApp;
     private Typeface tf;
     private MediaPlayer changeLevel, enterMode;
     private int levelIndex = 1;
@@ -62,10 +64,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         btnPre = parent.findViewById(R.id.btnPreMode);
         btnClassicalMode = parent.findViewById(R.id.btn_classical_mode);
         btnUnlimitedMode = parent.findViewById(R.id.btn_unlimited_mode);
+        btnMoreApp = parent.findViewById(R.id.btn_more_apps);
         tvLevel = (TextView) parent.findViewById(R.id.tvLevel);
-        tvClassicMode= (TextView) parent.findViewById(R.id.tv_classical_mode);
-        tvtUnlimitedMode= (TextView) parent.findViewById(R.id.tv_unlimited_mode);
+        tvClassicMode = (TextView) parent.findViewById(R.id.tv_classical_mode);
+        tvtUnlimitedMode = (TextView) parent.findViewById(R.id.tv_unlimited_mode);
+        tvMoreApp = (TextView) parent.findViewById(R.id.tv_more_app);
 
+        tvMoreApp.setPaintFlags(tvMoreApp.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         tvLevel.setTypeface(tf);
         tvClassicMode.setTypeface(tf);
         tvtUnlimitedMode.setTypeface(tf);
@@ -79,6 +84,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         btnUnlimitedMode.setOnClickListener(this);
         btnNext.setOnClickListener(this);
         btnPre.setOnClickListener(this);
+        btnMoreApp.setOnClickListener(this);
 
         updateLevelText();
     }
@@ -88,6 +94,34 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         if (MainActivity.ADS_ENABLE && LocalSharedPreferManager.getInstance().isRateAppOverLaunchTime(2)) {
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
+            mAdView.setAdListener(new AdListener() {
+                @Override
+                public void onAdClosed() {
+                    super.onAdClosed();
+                }
+
+                @Override
+                public void onAdFailedToLoad(int errorCode) {
+                    super.onAdFailedToLoad(errorCode);
+                    mAdView.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAdLeftApplication() {
+                    super.onAdLeftApplication();
+                }
+
+                @Override
+                public void onAdOpened() {
+                    super.onAdOpened();
+                }
+
+                @Override
+                public void onAdLoaded() {
+                    super.onAdLoaded();
+                    mAdView.setVisibility(View.VISIBLE);
+                }
+            });
         } else {
             mAdView.setVisibility(View.GONE);
         }
@@ -117,6 +151,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 levelIndex--;
             }
             updateLevelText();
+        } else if (view == btnMoreApp) {
+
         }
     }
 

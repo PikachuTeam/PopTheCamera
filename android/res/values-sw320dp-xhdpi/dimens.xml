@@ -22,6 +22,8 @@
     <dimen name="home_image_banner_margin_bottom">15dp</dimen>
     <dimen name="text_padding">0dp</dimen>
 
-    <dimen name="more_app_text_size">25dp</dimen>
+    <dimen name="more_app_text_size">18sp</dimen>
+    <dimen name="more_app_text_margin">5dp</dimen>
     <dimen name="button_more_app_margin">10dp</dimen>
+    <dimen name="more_app_image_size">25dp</dimen>
 </resources>
